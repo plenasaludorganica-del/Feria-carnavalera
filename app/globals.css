@@ -657,3 +657,7 @@ table.admin td form { display: inline-flex; gap: 6px; align-items: center; }
 .forgot { justify-self: end; font-size: .9rem; font-weight: 600; color: var(--fucsia); text-underline-offset: 3px; }
 .temp-pw { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .temp-pw code { padding: 4px 8px; border-radius: 8px; background: #fff3dc; color: #6b4100; font-size: .9rem; }
+
+/* Admin: etiquetas de estado en una sola línea */
+table.admin .badge { white-space: nowrap; }
+table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
