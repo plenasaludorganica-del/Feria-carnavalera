@@ -1,0 +1,93 @@
+# Feria del Comparsero
+
+Marketplace de insumos usados de comparsa (plumas, piedrería, trajes, armazones, zapatos y otros).
+Los vendedores pagan una cuota mensual por Mercado Pago y los compradores los contactan por WhatsApp.
+
+## Arquitectura
+
+```
+Navegador ──► Next.js 15 (App Router, en Vercel)
+               ├─ Páginas públicas (catálogo, producto) ──► Supabase RPC search_catalog / get_catalog_product
+               ├─ /ingresar ───────────────────────────────► Supabase Auth (email + contraseña)
+               ├─ /suscripcion ─► /api/mp/checkout ────────► Mercado Pago Checkout Pro
+               │                    Mercado Pago ──aviso──► /api/mp/webhook ─► register_payment() (service role)
+               ├─ /panel (vendedor) ───────────────────────► tablas profiles / products (RLS) + Storage
+               └─ /admin ──────────────────────────────────► RPC admin_* (solo role = admin)
+```
+
+| Capa | Qué hace | Dónde |
+|---|---|---|
+| Base de datos | Perfiles, productos, pagos, reglas de visibilidad, RLS | `supabase/migrations/0001_feria_init.sql` |
+| Clientes Supabase | Navegador, servidor (con sesión) y service role (solo webhook) | `lib/supabase/*` |
+| Sesión y protección | Refresca sesión y protege `/panel`, `/admin`, `/suscripcion` | `middleware.ts`, `lib/session.ts` |
+| Mercado Pago | Preferencia de pago, lectura del pago, firma del webhook | `lib/mercadopago.ts`, `app/api/mp/*` |
+| Diseño | Tokens, portada con capas, tarjetas blancas | `app/globals.css`, `components/*` |
+
+### Regla de vencimiento (último día de cada mes)
+
+Cada perfil tiene `paid_until`, el último día del mes ya pagado. **El estado se calcula, no se guarda.**
+Un vendedor está activo cuando cumple `not suspended and paid_until >= hoy`.
+
+- El 1° del mes, quien no pagó deja de cumplir la condición. Sus productos desaparecen del catálogo sin que corra ningún proceso, y **no se borran**.
+- Al entrar a `/panel` con la cuota vencida, se lo manda a `/suscripcion`, que muestra el aviso y el botón para pagar.
+- Cuando Mercado Pago confirma el pago, `register_payment()` calcula el nuevo `paid_until`:
+  - si estaba al día, suma el mes siguiente;
+  - si estaba vencido o es nuevo, cubre hasta el fin del mes actual.
+  
+  Los productos vuelven a verse tal como estaban.
+- `register_payment()` es idempotente: si Mercado Pago avisa dos veces, el pago se cuenta una sola vez.
+
+La zona horaria del negocio está en `app_today()` (SQL) y en `todayISO()` (`lib/subscription.ts`).
+Por defecto es Buenos Aires. Si operás desde Uruguay, cambiá las dos a `America/Montevideo`.
+
+## Puesta en marcha
+
+### 1. Supabase
+1. Creá un proyecto nuevo, por ejemplo "feria-del-comparsero".
+2. En **SQL Editor**, pegá y ejecutá `supabase/migrations/0001_feria_init.sql`. Crea las tablas, la RLS, las funciones y el bucket `product-images`.
+3. En **Authentication → URL Configuration**:
+   - Site URL: tu dominio.
+   - Redirect URLs: agregá `https://TU-DOMINIO/auth/callback`.
+4. Registrate en la web y hacete admin:
+   ```sql
+   update public.profiles set role = 'admin'
+   where id = (select id from auth.users where email = 'TU_EMAIL');
+   ```
+
+### 2. Variables de entorno
+Copiá `.env.example` a `.env.local` y completalo. En Vercel, cargá las mismas variables en Project Settings → Environment Variables.
+
+### 3. Mercado Pago
+1. En [Tus integraciones](https://www.mercadopago.com.ar/developers/panel/app), creá una aplicación de tipo **Checkout Pro**.
+2. Copiá el Access Token a `MP_ACCESS_TOKEN`. Usá uno `TEST-...` para probar: el sistema usa el checkout de prueba automáticamente.
+3. En **Webhooks**, cargá la URL `https://TU-DOMINIO/api/mp/webhook` con el evento **Pagos**. Copiá la clave secreta a `MP_WEBHOOK_SECRET`.
+4. Definí la cuota en `MP_MONTHLY_PRICE`.
+
+> Para probar el webhook en local hace falta una URL pública (por ejemplo `ngrok http 3000`), puesta en `NEXT_PUBLIC_SITE_URL`.
+
+### 4. Correr
+```bash
+npm install
+npm run dev
+```
+Sin las claves de Supabase el sitio muestra **productos de muestra** (`lib/demo.ts`), para revisar el diseño.
+
+## Piezas de Higgsfield
+
+| Pieza | Dónde va |
+|---|---|
+| Logotipo / letras "Feria del Comparsero" | `public/brand/…` + `NEXT_PUBLIC_BRAND_WORDMARK=/brand/archivo.png`. Hasta entonces se ve una versión provisoria (`components/BrandWordmark.tsx`). |
+| Fondo de la portada | `public/brand/fondo-plumas-brillos.webp` |
+| Figuras laterales | `public/brand/comparsera.webp`, `comparsero.webp` |
+| Textura del catálogo | `public/brand/plumas.webp` |
+| Banda "¿Te quedaron plumas…?" | `public/brand/coronas-piedreria.webp` |
+
+Para optimizar nuevas imágenes (WebP liviano): `node scripts/optimize-images.mjs carpeta-con-jpgs`.
+
+## Rendimiento
+
+- **Lluvia de brillos**: un solo `<canvas>` con sprites pre-dibujados. Menos partículas en el celular, resolución limitada a 1,5x. Se pausa fuera de pantalla o con la pestaña oculta.
+- **Parallax**: un único listener de scroll con `requestAnimationFrame` que escribe una variable CSS usada en `translate3d` (GPU). La inclinación 3D con el mouse solo se activa en computadoras.
+- **Sensación de flotar**: la portada queda fija (`position: sticky`) y el catálogo sube por encima como un telón, sin costo de JavaScript.
+- **Reducir movimiento**: con "reducir movimiento" activado en el sistema, se apaga todo y queda un cuadro estático.
+- **Fotos de productos**: se achican a WebP de 1600 px en el navegador antes de subirse a Storage y se sirven con `next/image`.
