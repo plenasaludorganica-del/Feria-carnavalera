@@ -17,7 +17,7 @@ Navegador ──► Next.js 15 (App Router, en Cloudflare Workers vía OpenNext)
 
 | Capa | Qué hace | Dónde |
 |---|---|---|
-| Base de datos | Perfiles, productos, pagos, reglas de visibilidad, RLS | `supabase/migrations/0001_feria_init.sql` |
+| Base de datos | Perfiles, productos, pagos, reglas de visibilidad, RLS | `supabase/migrations/0001…0004` (aplicadas en el proyecto `feria-carnavalera`) |
 | Clientes Supabase | Navegador, servidor (con sesión) y service role (solo webhook) | `lib/supabase/*` |
 | Sesión y protección | Refresca sesión y protege `/panel`, `/admin`, `/suscripcion` | `middleware.ts`, `lib/session.ts` |
 | Mercado Pago | Preferencia de pago, lectura del pago, firma del webhook | `lib/mercadopago.ts`, `app/api/mp/*` |
@@ -53,6 +53,11 @@ Está configurada para Argentina (Buenos Aires).
    update public.profiles set role = 'admin'
    where id = (select id from auth.users where email = 'TU_EMAIL');
    ```
+
+### Emails de registro (importante)
+El servicio de email que trae Supabase de fábrica **solo manda emails a los miembros de tu equipo de Supabase**, con un límite de pocos por hora. Los vendedores nunca recibirían el email de confirmación.
+- **Para arrancar:** desactivá *Authentication → Sign In / Providers → Email → Confirm email*. El vendedor entra directo al pago al registrarse.
+- **Más adelante:** configurá un servicio de email propio (por ejemplo Resend, con plan gratis) en *Authentication → Emails → SMTP Settings*. Con eso podés volver a activar la confirmación y sumar "Olvidé mi contraseña".
 
 ### 2. Variables de entorno
 Copiá `.env.example` a `.env.local` y completalo. En Cloudflare se cargan como se explica en "Publicar en Cloudflare".
