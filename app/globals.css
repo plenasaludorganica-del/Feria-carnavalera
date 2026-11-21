@@ -971,3 +971,8 @@ body { background: #ffb02e; }
 }
 .page::before { z-index: -1; }
 @keyframes twinkle { from { opacity: .45; } to { opacity: .95; } }
+
+/* La tabla del admin contiene etiquetas invisibles (sr-only, position:absolute):
+   sin esto se escapaban del scroll y el celular alejaba toda la página. */
+.table-wrap { position: relative; max-width: 100%; }
+html, body { overflow-x: clip; }
