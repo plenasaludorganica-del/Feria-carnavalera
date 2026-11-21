@@ -97,3 +97,76 @@ export function verifySignature(opts: { signature: string | null; requestId: str
     return false;
   }
 }
+
+/* =====================================================================
+   DÉBITO AUTOMÁTICO (Suscripciones sin plan / "preapproval")
+   - Se cobra el día 1 de cada mes (billing_day = 1): la cuota vence el
+     último día del mes y se renueva sola al empezar el siguiente.
+   - El primer cobro es proporcional a los días que quedan del mes actual.
+   ===================================================================== */
+
+export interface MPPreapproval {
+  id: string;
+  status: "pending" | "authorized" | "paused" | "cancelled";
+  external_reference: string | null;
+  init_point?: string;
+  payer_email?: string;
+}
+
+export interface MPAuthorizedPayment {
+  id: number;
+  preapproval_id: string;
+  status: string; // scheduled | processed | recycling | cancelled
+  transaction_amount: number;
+  currency_id: string;
+  external_reference?: string | null;
+  payment?: { id: number; status: string; status_detail?: string } | null;
+}
+
+async function mp<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token()}`,
+      "Content-Type": "application/json",
+      ...(init?.method && init.method !== "GET" ? { "X-Idempotency-Key": crypto.randomUUID() } : {}),
+      ...init?.headers,
+    },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Mercado Pago ${init?.method ?? "GET"} ${path} → ${res.status}: ${await res.text()}`);
+  return res.json() as Promise<T>;
+}
+
+export async function createPreapproval(args: { userId: string; email: string; siteUrl: string }) {
+  const base = {
+    reason: "Feria del Comparsero — cuota mensual de vendedor",
+    external_reference: args.userId,
+    payer_email: args.email,
+    back_url: `${args.siteUrl}/suscripcion/resultado`,
+    status: "pending", // el vendedor autoriza la tarjeta en el checkout de Mercado Pago
+  };
+  const auto = { frequency: 1, frequency_type: "months", transaction_amount: monthlyPrice(), currency_id: currency() };
+  try {
+    return await mp<MPPreapproval>("/preapproval", {
+      method: "POST",
+      body: JSON.stringify({ ...base, auto_recurring: { ...auto, billing_day: 1, billing_day_proportional: true } }),
+    });
+  } catch (e) {
+    // Si la cuenta no admite día fijo de cobro, se crea con cobro mensual desde hoy.
+    console.warn("[mp] preapproval con billing_day rechazado, reintento sin él:", e);
+    return mp<MPPreapproval>("/preapproval", { method: "POST", body: JSON.stringify({ ...base, auto_recurring: auto }) });
+  }
+}
+
+export const getPreapproval = (id: string) => mp<MPPreapproval>(`/preapproval/${encodeURIComponent(id)}`);
+export const getAuthorizedPayment = (id: string) =>
+  mp<MPAuthorizedPayment>(`/authorized_payments/${encodeURIComponent(id)}`);
+export const cancelPreapproval = (id: string) =>
+  mp<MPPreapproval>(`/preapproval/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify({ status: "cancelled" }) });
+/** Para cambiar la cuota a quienes ya están suscriptos. */
+export const updatePreapprovalAmount = (id: string, amount: number) =>
+  mp<MPPreapproval>(`/preapproval/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify({ auto_recurring: { transaction_amount: amount, currency_id: currency() } }),
+  });

@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
 import type { OwnProduct } from "@/lib/types";
 import ProfileForm from "./ProfileForm";
-import { deleteProduct, setProductStatus } from "./actions";
+import { cancelAutoDebit, deleteProduct, setProductStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Mi panel" };
 
@@ -34,10 +34,23 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
               <strong>{copy.label}</strong>
               <span>Vence el {formatDate(profile.paid_until)}{left >= 0 ? ` (${left === 0 ? "hoy" : `en ${left} días`})` : ""}</span>
             </div>
-            <p className="sub" style={{ margin: "0 0 12px" }}>
-              La cuota vence el último día de cada mes. Si no la renovás, tus publicaciones se ocultan, pero no se borran.
-            </p>
-            <Link href="/suscripcion" className="btn btn-ghost" style={{ width: "100%" }}>Adelantar el próximo mes</Link>
+            {profile.mp_preapproval_status === "authorized" ? (
+              <>
+                <p className="sub" style={{ margin: "0 0 12px" }}>
+                  Débito automático activo: Mercado Pago renueva tu cuota sola el día 1 de cada mes.
+                </p>
+                <form action={cancelAutoDebit}>
+                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }}>Dar de baja el débito automático</button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="sub" style={{ margin: "0 0 12px" }}>
+                  Sin débito automático: la cuota vence el último día del mes. Si no la renovás, tus publicaciones se ocultan, pero no se borran.
+                </p>
+                <Link href="/suscripcion" className="btn btn-oro" style={{ width: "100%" }}>Activar débito automático</Link>
+              </>
+            )}
           </div>
           <div className="paper"><ProfileForm profile={profile} /></div>
           <form action="/auth/salir" method="post">

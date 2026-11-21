@@ -38,7 +38,7 @@ Un vendedor está activo cuando cumple `not suspended and paid_until >= hoy`.
 - `register_payment()` es idempotente: si Mercado Pago avisa dos veces, el pago se cuenta una sola vez.
 
 La zona horaria del negocio está en `app_today()` (SQL) y en `todayISO()` (`lib/subscription.ts`).
-Por defecto es Buenos Aires. Si operás desde Uruguay, cambiá las dos a `America/Montevideo`.
+Está configurada para Argentina (Buenos Aires).
 
 ## Puesta en marcha
 
@@ -60,7 +60,14 @@ Copiá `.env.example` a `.env.local` y completalo. En Vercel, cargá las mismas 
 ### 3. Mercado Pago
 1. En [Tus integraciones](https://www.mercadopago.com.ar/developers/panel/app), creá una aplicación de tipo **Checkout Pro**.
 2. Copiá el Access Token a `MP_ACCESS_TOKEN`. Usá uno `TEST-...` para probar: el sistema usa el checkout de prueba automáticamente.
-3. En **Webhooks**, cargá la URL `https://TU-DOMINIO/api/mp/webhook` con el evento **Pagos**. Copiá la clave secreta a `MP_WEBHOOK_SECRET`.
+3. En **Webhooks**, cargá la URL `https://TU-DOMINIO/api/mp/webhook` con los eventos **Pagos**, **Planes y suscripciones** y **Pagos recurrentes**. Copiá la clave secreta a `MP_WEBHOOK_SECRET`.
+
+### Débito automático
+- El botón principal crea una suscripción de Mercado Pago (`/preapproval`) con cobro el **día 1 de cada mes**. El primer cobro es proporcional a los días que quedan del mes.
+- Cada cobro llega al webhook como "Pagos recurrentes" y extiende `paid_until` hasta el fin de mes.
+- Con el débito activo hay **3 días de gracia** después del vencimiento. Mercado Pago puede tardar o reintentar el cobro del día 1, y así el vendedor no desaparece del catálogo por unas horas. Sin débito, la gracia es 0.
+- El vendedor puede darlo de baja desde su panel. También existe la opción "pagar solo este mes" (Checkout Pro).
+- Para cambiar el precio a quienes ya están suscriptos: `updatePreapprovalAmount()` en `lib/mercadopago.ts`.
 4. Definí la cuota en `MP_MONTHLY_PRICE`.
 
 > Para probar el webhook en local hace falta una URL pública (por ejemplo `ngrok http 3000`), puesta en `NEXT_PUBLIC_SITE_URL`.

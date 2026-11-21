@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isCategory, normalizeWhatsapp } from "@/lib/config";
+import { cancelPreapproval } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 
 export type FormState = { error?: string; ok?: string };
@@ -81,4 +82,13 @@ export async function deleteProduct(form: FormData) {
   if (paths.length) await supabase.storage.from("product-images").remove(paths);
   revalidatePath("/panel");
   revalidatePath("/");
+}
+
+/** Da de baja el débito automático. La cuota ya pagada sigue vigente hasta fin de mes. */
+export async function cancelAutoDebit() {
+  const { profile } = await requireUser("/panel");
+  if (!profile.mp_preapproval_id) return;
+  await cancelPreapproval(profile.mp_preapproval_id);
+  // El webhook "subscription_preapproval" actualiza el estado en la base.
+  revalidatePath("/panel");
 }
