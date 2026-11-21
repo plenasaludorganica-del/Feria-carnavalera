@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { supabaseConfigured } from "@/lib/config";
 import { getSiteUrl } from "@/lib/site-url";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasServiceKey } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string; info?: string };
@@ -34,7 +34,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
 
   // Con la clave de servidor creamos la cuenta ya confirmada: no depende de
   // que Supabase pueda mandar el email de confirmación.
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (hasServiceKey()) {
     const { error: createError } = await createAdminClient().auth.admin.createUser({
       email,
       password,
@@ -42,6 +42,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
       user_metadata: { display_name: name },
     });
     if (createError) {
+      console.error("[registro] createUser:", createError.message);
       const taken = /already|registered|exists/i.test(createError.message);
       return { error: taken ? "Ese email ya tiene cuenta. Ingresá con tu contraseña." : "No se pudo crear la cuenta. Revisá el email e intentá de nuevo." };
     }
