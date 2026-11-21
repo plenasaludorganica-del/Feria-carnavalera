@@ -2,11 +2,12 @@
    FERIA DEL COMPARSERO — tokens y estilos base
    ========================================================= */
 :root {
-  --noche: #1b0b3f;        /* fondo del corso */
-  --noche-2: #2a1260;
-  --fucsia: #e01f84;       /* pluma */
+  --noche: #1c0716;        /* fondo del corso */
+  --noche-2: #341029;
+  --fucsia: #ff2e93;       /* pluma / neón: acción */
+  --naranja: #ff7a1a;      /* urgencia: botones de compra */
   --pavo: #0e9aa7;         /* pavo real */
-  --oro: #f5b83d;          /* strass dorado */
+  --oro: #ffc23d;          /* strass dorado: valor */
   --oro-claro: #ffe3a1;
   --papel: #ffffff;        /* tarjetas: siempre blanco */
   --tinta: #1d1430;        /* texto sobre papel */
@@ -88,7 +89,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: background-color .25s ease, box-shadow .25s ease;
 }
 .site-header[data-solid="true"] {
-  background: #1b0b3fe6; backdrop-filter: blur(10px);
+  background: #1c0716e6; backdrop-filter: blur(10px);
   box-shadow: 0 1px 0 #ffffff14;
 }
 .site-header .wrap { display: flex; align-items: center; gap: 1rem; min-height: 64px; }
@@ -138,8 +139,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hero-bg::after {
   content: ""; position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 55% 45% at 50% 48%, #1b0b3fb3 0%, #1b0b3f40 60%, transparent 80%),
-    linear-gradient(180deg, #1b0b3f99 0%, transparent 25%, transparent 60%, var(--noche) 100%);
+    radial-gradient(ellipse 55% 45% at 50% 48%, #1c0716b3 0%, #1c071640 60%, transparent 80%),
+    linear-gradient(180deg, #1c071699 0%, transparent 25%, transparent 60%, var(--noche) 100%);
 }
 .hero-figure { bottom: -4%; width: min(30vw, 420px); }
 .hero-figure img {
@@ -336,7 +337,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .steps li {
   counter-increment: paso;
   padding: 24px; border-radius: 20px;
-  background: linear-gradient(160deg, #2a1260, #1b0b3f);
+  background: linear-gradient(160deg, #341029, #1c0716);
   box-shadow: inset 0 0 0 1px #ffffff1a;
 }
 .steps li::before {
@@ -352,7 +353,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px;
   padding: 32px; border-radius: 24px;
   background:
-    linear-gradient(100deg, #e01f84ee, #7a1fb0dd 60%, #0e9aa7cc),
+    linear-gradient(100deg, #e01f84ee, #ff2e93cc 60%, #0e9aa7cc),
     url("/brand/coronas-piedreria.webp") center/cover;
 }
 .cta-band h2 { margin: 0 0 6px; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.1; }
@@ -673,7 +674,7 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
 .share-wa { width: auto; min-height: 48px; font-size: 1rem; }
 .share-card {
   padding: clamp(20px, 3vw, 28px); border-radius: 20px;
-  background: linear-gradient(135deg, #2a1260, #1b0b3f 60%);
+  background: linear-gradient(135deg, #341029, #1c0716 60%);
   box-shadow: inset 0 0 0 1px #f5b83d55;
 }
 .share-card h2 { margin: 0 0 6px; font-size: clamp(1.3rem, 2.6vw, 1.7rem); }
@@ -694,7 +695,7 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
   position: fixed; inset: 0; z-index: 100;
   pointer-events: auto;
   /* fondo oscuro mientras carga el telón; se apaga cuando se abren las puertas */
-  background-color: #1b0b3f;
+  background-color: #1c0716;
   animation:
     intro-bg-out .35s 1.15s ease-out forwards,
     intro-out .5s 2.45s cubic-bezier(.4, 0, .2, 1) forwards;
@@ -723,10 +724,10 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
 .intro-right { z-index: 1; }
 .intro-panel::after { /* sombra que da volumen al abrir */
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, transparent 40%, #1b0b3f99);
+  background: linear-gradient(90deg, transparent 40%, #1c071699);
   opacity: 0; animation: door-shade 1.55s 1.05s ease-in forwards;
 }
-.intro-right::after { background: linear-gradient(270deg, transparent 40%, #1b0b3f99); }
+.intro-right::after { background: linear-gradient(270deg, transparent 40%, #1c071699); }
 
 .intro-glow {
   position: absolute; left: 50%; top: 50%; width: 60vmax; height: 60vmax; translate: -50% -50%;
@@ -747,7 +748,7 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
 .intro-skip {
   position: absolute; right: 20px; bottom: 22px; z-index: 2;
   padding: .55rem 1.1rem; border-radius: 999px; border: 0; cursor: pointer;
-  background: #1b0b3f99; color: #fff; font-weight: 700; backdrop-filter: blur(6px);
+  background: #1c071699; color: #fff; font-weight: 700; backdrop-filter: blur(6px);
   animation: fade-in .4s .3s both;
 }
 .intro-fast, .intro-fast * { animation-duration: .35s !important; animation-delay: 0s !important; }
@@ -834,7 +835,7 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
 .intro-mark::before {
   content: ""; position: absolute; left: 50%; top: 50%; width: min(1100px, 120vw); height: min(560px, 70vh);
   translate: -50% -50%; border-radius: 50%;
-  background: radial-gradient(ellipse at center, #12052be6 0%, #1b0b3fb3 38%, transparent 70%);
+  background: radial-gradient(ellipse at center, #130410e6 0%, #1c0716b3 38%, transparent 70%);
   filter: blur(10px);
 }
 .intro-mark > * { position: relative; }
@@ -863,8 +864,8 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
   /* velo para que los botones se lean sobre las figuras */
   .hero-bg::after {
     background:
-      radial-gradient(ellipse 90% 40% at 50% 34%, #1b0b3fc0 0%, #1b0b3f55 60%, transparent 85%),
-      linear-gradient(180deg, #1b0b3f99 0%, transparent 25%, transparent 55%, var(--noche) 100%);
+      radial-gradient(ellipse 90% 40% at 50% 34%, #1c0716c0 0%, #1c071655 60%, transparent 85%),
+      linear-gradient(180deg, #1c071699 0%, transparent 25%, transparent 55%, var(--noche) 100%);
   }
 }
 
@@ -877,3 +878,65 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
   50%  { transform: rotateX(-1.5deg) rotateY(2deg) scale(1.06); }
   100% { transform: rotateX(1deg) rotateY(3deg) scale(1.04); }
 }
+
+
+/* =========================================================
+   PALETA DE VENTA: fondo vino cálido + neón fucsia/naranja/oro
+   ========================================================= */
+.sheet {
+  background:
+    radial-gradient(60% 40% at 15% 8%, #ff2e9326, transparent 70%),
+    radial-gradient(50% 35% at 90% 30%, #ff7a1a1f, transparent 70%),
+    radial-gradient(70% 40% at 50% 85%, #ffc23d14, transparent 70%),
+    var(--noche);
+}
+.page {
+  background:
+    radial-gradient(60% 30% at 85% 0%, #ff2e9322, transparent 70%),
+    radial-gradient(50% 30% at 0% 40%, #ff7a1a18, transparent 70%);
+}
+
+/* Botón principal: naranja-dorado con halo neón (el más llamativo de la página) */
+.btn-oro {
+  background: linear-gradient(180deg, #ffd65c 0%, #ffa21f 50%, #ff6a1a 100%);
+  color: #2a0a00;
+  box-shadow:
+    0 1px 0 #fff8 inset,
+    0 0 0 1px #ffd65c88,
+    0 0 18px #ff8a1fb3,
+    0 0 46px #ff2e9366;
+}
+.btn-oro:hover { box-shadow: 0 1px 0 #fff8 inset, 0 0 0 1px #ffe08a, 0 0 26px #ff8a1fe6, 0 0 70px #ff2e9399; }
+@media all { .hero-cta-main.btn-oro { animation: neon-pulse 2.6s ease-in-out infinite; } }
+@keyframes neon-pulse {
+  50% { box-shadow: 0 1px 0 #fff8 inset, 0 0 0 1px #ffe08a, 0 0 30px #ff8a1fff, 0 0 80px #ff2e93aa; }
+}
+
+/* Botón secundario de acción: fucsia neón */
+.btn-fucsia { background: var(--fucsia); color: #fff; box-shadow: 0 0 16px #ff2e93aa, 0 0 40px #ff2e9355; }
+.btn-fucsia:hover { background: #ff4aa3; box-shadow: 0 0 22px #ff2e93dd, 0 0 56px #ff2e9377; }
+
+/* Buscador con anillo neón */
+.search { box-shadow: 0 20px 50px -20px #000, 0 0 0 3px #ff2e9366, 0 0 30px #ff2e9344; }
+.search:focus-within { box-shadow: 0 20px 50px -20px #000, 0 0 0 3px var(--oro), 0 0 36px #ffc23d77; }
+
+/* Categorías: borde neón suave que se enciende al pasar */
+.cat { background: #ffffff0a; box-shadow: inset 0 0 0 1px #ff2e9355, 0 0 18px #ff2e931a; }
+.cat:hover { background: #ff2e931a; box-shadow: inset 0 0 0 1px #ff2e93, 0 0 22px #ff2e9366; }
+.cat svg { filter: drop-shadow(0 0 6px #ff2e9399); }
+
+/* Tarjetas blancas: se iluminan en neón al tocarlas */
+.tag:hover, .tag.tilting {
+  box-shadow: 0 0 0 2px #ff2e93, 0 0 26px #ff2e9399, 0 0 70px #ffc23d44, 0 18px 40px -24px #000;
+}
+.tag-price { color: #c4002f; }
+
+/* Títulos con un leve resplandor */
+.section-head h2, .page-title { text-shadow: 0 0 22px #ff2e9355; }
+
+/* Pasos y bloques destacados en vino con borde neón */
+.steps li { background: linear-gradient(160deg, #3a0f2c, #1c0716); box-shadow: inset 0 0 0 1px #ff2e9344, 0 0 30px #ff2e931f; }
+.steps li::before { background: linear-gradient(180deg, #ffd65c, #ff7a1a); color: #2a0a00; box-shadow: 0 0 16px #ff8a1fb3; }
+.share-card { background: linear-gradient(135deg, #3a0f2c, #1c0716 60%); box-shadow: inset 0 0 0 1px #ff2e9366, 0 0 40px #ff2e9326; }
+.cta-band { box-shadow: 0 0 50px #ff2e9355; }
+.site-header[data-solid="true"] { box-shadow: 0 1px 0 #ff2e9344, 0 8px 30px -12px #ff2e9355; }
