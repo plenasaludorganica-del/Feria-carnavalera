@@ -72,12 +72,17 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
           <ol className="setup-steps">
             <li data-done={hasContact}>
               <strong>Tus datos de contacto</strong>
-              <span>{hasContact ? `WhatsApp +${profile.whatsapp}` : "Cargá tu WhatsApp acá al costado."}</span>
+              <span>{hasContact ? `WhatsApp +${profile.whatsapp}` : "Cargá tu WhatsApp para que te escriban."}</span>
+              <a href="#contacto" className="btn btn-ghost btn-sm">{hasContact ? "Cambiar mis datos" : "Cargar mi WhatsApp"}</a>
             </li>
             <li data-done={hasProducts}>
               <strong>Cargá tus insumos</strong>
               <span>{hasProducts ? `${products.length} cargado${products.length === 1 ? "" : "s"}` : "Hasta 5 fotos por publicación."}</span>
-              {hasContact && <Link href="/panel/publicar" className="btn btn-ghost btn-sm">Cargar un insumo</Link>}
+              {hasContact ? (
+                <Link href="/panel/publicar" className="btn btn-ghost btn-sm">Cargar un insumo</Link>
+              ) : (
+                <a href="#contacto" className="btn btn-ghost btn-sm">Primero cargá tu WhatsApp</a>
+              )}
             </li>
             <li data-done={false}>
               <strong>Mirá cómo queda</strong>
@@ -130,7 +135,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
               <Link href={`/puesto/${user.id}`} className="btn btn-ghost btn-sm" style={{ width: "100%", marginTop: 10 }}>Ver mi puesto público</Link>
             </div>
           )}
-          <div className="paper"><ProfileForm profile={profile} /></div>
+          <div className="paper" id="contacto" style={{ scrollMarginTop: 90 }}><ProfileForm profile={profile} /></div>
           <form action="/auth/salir" method="post">
             <button className="btn btn-claro" style={{ width: "100%" }}>Cerrar sesión</button>
           </form>
