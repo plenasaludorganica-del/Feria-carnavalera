@@ -6,5 +6,8 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "feria-carnavalera" }],
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Arma la versión para Cloudflare antes de cada "wrangler deploy"
+  // (así funciona también con la configuración automática de Cloudflare).
+  "build": { "command": "npx opennextjs-cloudflare build" }
 }

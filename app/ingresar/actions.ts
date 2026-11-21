@@ -1,6 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
-import { siteUrl, supabaseConfigured } from "@/lib/config";
+import { supabaseConfigured } from "@/lib/config";
+import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string; info?: string };
@@ -34,7 +35,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
     password,
     options: {
       data: { display_name: name },
-      emailRedirectTo: `${siteUrl}/auth/callback?next=/suscripcion`,
+      emailRedirectTo: `${await getSiteUrl()}/auth/callback?next=/suscripcion`,
     },
   });
   if (error) return { error: error.message.includes("registered") ? "Ese email ya tiene cuenta. Ingresá con tu contraseña." : error.message };

@@ -7,7 +7,7 @@ const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-br
 const bagel = Bagel_Fat_One({ subsets: ["latin"], weight: "400", variable: "--font-bagel", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  ...(process.env.NEXT_PUBLIC_SITE_URL ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) } : {}),
   title: { default: "Feria del Comparsero", template: "%s · Feria del Comparsero" },
   description: "Comprá y vendé plumas, piedrería, trajes, armazones y zapatos de comparsa usados.",
   openGraph: { images: ["/brand/fondo-plumas-brillos.webp"] },

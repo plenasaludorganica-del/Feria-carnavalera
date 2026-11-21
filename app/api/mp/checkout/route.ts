@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { siteUrl } from "@/lib/config";
 import { createPreapproval, createSubscriptionPreference } from "@/lib/mercadopago";
 import { getSessionProfile } from "@/lib/session";
+import { getSiteUrl } from "@/lib/site-url";
 
 /**
  * POST /api/mp/checkout            → activa el débito automático mensual (por defecto)
@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
   if (!user || !profile) return NextResponse.redirect(new URL("/ingresar?next=/suscripcion", req.url), 303);
   if (profile.suspended) return NextResponse.redirect(new URL("/suscripcion", req.url), 303);
   const sandbox = process.env.MP_ACCESS_TOKEN?.startsWith("TEST-");
+  const siteUrl = await getSiteUrl();
 
   try {
     if (new URL(req.url).searchParams.get("modo") === "unico") {
