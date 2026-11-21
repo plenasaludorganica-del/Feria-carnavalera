@@ -5,11 +5,12 @@ import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
 import type { OwnProduct } from "@/lib/types";
 import ProfileForm from "./ProfileForm";
-import { cancelAutoDebit, deleteProduct, setProductStatus } from "./actions";
+import ConfirmButton from "@/components/ConfirmButton";
+import { cancelAutoDebit, deleteProduct, markSold, setProductStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Mi panel" };
 
-export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string }> }) {
+export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string; vendido?: string }> }) {
   const sp = await searchParams;
   const { supabase, profile, state, user } = await requireUser("/panel");
   const { data } = await supabase
@@ -64,6 +65,12 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             {profile.whatsapp && <Link href="/panel/publicar" className="btn btn-oro">Publicar un insumo</Link>}
           </div>
           {sp.guardado && <p className="form-ok" role="status">Publicación guardada.</p>}
+          {sp.vendido && <p className="form-ok" role="status">¡Felicitaciones por la venta! La publicación se quitó de la feria.</p>}
+          {(profile.sold_count ?? 0) > 0 && (
+            <p className="sub" style={{ margin: "0 0 12px" }}>
+              Ya vendiste {profile.sold_count === 1 ? "1 insumo" : `${profile.sold_count} insumos`} en la feria.
+            </p>
+          )}
           {!profile.whatsapp && (
             <div className="notice">Cargá tu WhatsApp en “Tus datos de contacto” para poder publicar. Es la forma en que te contactan los compradores.</div>
           )}
@@ -93,6 +100,16 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                       </div>
                     </div>
                     <div className="actions">
+                      <form action={markSold}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <ConfirmButton
+                          className="btn btn-vendido btn-sm"
+                          message={`¿Vendiste “${p.title}”? Se quita de la feria y se borran sus fotos. No se puede deshacer.`}
+                          pendingLabel="Quitando…"
+                        >
+                          Ya lo vendí
+                        </ConfirmButton>
+                      </form>
                       {!paused && <Link className="btn btn-ghost btn-sm" href={`/producto/${p.id}`}>Ver</Link>}
                       <Link className="btn btn-ghost btn-sm" href={`/panel/editar/${p.id}`}>Editar</Link>
                       <form action={setProductStatus}>
@@ -102,7 +119,14 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                       </form>
                       <form action={deleteProduct}>
                         <input type="hidden" name="id" value={p.id} />
-                        <button className="btn btn-peligro btn-sm" aria-label={`Eliminar ${p.title}`}>Eliminar</button>
+                        <ConfirmButton
+                          className="btn btn-peligro btn-sm"
+                          ariaLabel={`Eliminar ${p.title}`}
+                          message={`¿Eliminar “${p.title}”? Se borran la publicación y sus fotos.`}
+                          pendingLabel="Eliminando…"
+                        >
+                          Eliminar
+                        </ConfirmButton>
                       </form>
                     </div>
                   </li>

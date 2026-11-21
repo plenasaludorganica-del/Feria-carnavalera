@@ -41,6 +41,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <div><b>{count("vencido")}</b>Vencidos</div>
             <div><b>{count("sin_pago")}</b>Sin primer pago</div>
             <div><b>{count("suspendido")}</b>Suspendidos</div>
+            <div><b>{all.reduce((n, s) => n + (s.sold_count ?? 0), 0)}</b>Ventas concretadas</div>
           </div>
 
           <form className="search" style={{ marginBottom: 16 }}>
@@ -59,7 +60,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               <thead>
                 <tr>
                   <th>Vendedor</th><th>Contacto</th><th>Estado</th><th>Débito</th><th>Vence</th><th>Último pago</th>
-                  <th>Productos</th><th>Cobro manual</th><th>Cuenta</th>
+                  <th>Publicados</th><th>Vendidos</th><th>Cobro manual</th><th>Cuenta</th>
                 </tr>
               </thead>
               <tbody>
@@ -72,6 +73,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                     <td>{formatDate(s.paid_until)}</td>
                     <td>{s.last_payment_at ? formatDate(s.last_payment_at) : "—"}</td>
                     <td>{s.products_count}</td>
+                    <td>{s.sold_count}</td>
                     <td>
                       <form action={setPaidUntil}>
                         <input type="hidden" name="id" value={s.id} />
@@ -91,7 +93,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                     </td>
                   </tr>
                 ))}
-                {!rows.length && <tr><td colSpan={9} style={{ textAlign: "center", padding: 24 }}>No hay vendedores con ese filtro.</td></tr>}
+                {!rows.length && <tr><td colSpan={10} style={{ textAlign: "center", padding: 24 }}>No hay vendedores con ese filtro.</td></tr>}
               </tbody>
             </table>
           </div>

@@ -71,18 +71,36 @@ export async function setProductStatus(form: FormData) {
   revalidatePath("/");
 }
 
+/** Rutas de Storage (foto grande + miniatura) a partir de las URLs públicas. */
+function storagePaths(images: string[] | null | undefined, userId: string) {
+  return (images ?? [])
+    .map((u) => u.split("/product-images/")[1])
+    .filter((p): p is string => Boolean(p?.startsWith(userId + "/")))
+    .flatMap((p) => [p, p.replace(/\.webp$/, "_t.webp")]);
+}
+
 export async function deleteProduct(form: FormData) {
   const { supabase, user } = await requireUser("/panel");
   const id = String(form.get("id"));
   const { data } = await supabase.from("products").select("images").eq("id", id).eq("seller_id", user.id).single();
   await supabase.from("products").delete().eq("id", id).eq("seller_id", user.id);
-  const paths = (data?.images ?? [])
-    .map((u: string) => u.split("/product-images/")[1])
-    .filter((p: string | undefined): p is string => Boolean(p?.startsWith(user.id + "/")))
-    .flatMap((p: string) => [p, p.replace(/\.webp$/, "_t.webp")]);
+  const paths = storagePaths(data?.images, user.id);
   if (paths.length) await supabase.storage.from("product-images").remove(paths);
   revalidatePath("/panel");
   revalidatePath("/");
+}
+
+/** "Ya lo vendí": quita la publicación, borra sus fotos y suma la venta al contador. */
+export async function markSold(form: FormData) {
+  const { supabase, user } = await requireUser("/panel");
+  const { data: images, error } = await supabase.rpc("mark_product_sold", { pid: String(form.get("id")) });
+  if (!error) {
+    const paths = storagePaths(images as string[] | null, user.id);
+    if (paths.length) await supabase.storage.from("product-images").remove(paths);
+  }
+  revalidatePath("/panel");
+  revalidatePath("/");
+  redirect("/panel?vendido=1");
 }
 
 /** Da de baja el débito automático. La cuota ya pagada sigue vigente hasta fin de mes. */
