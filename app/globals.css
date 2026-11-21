@@ -249,7 +249,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* ---------- Categorías ---------- */
 .cats {
-  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px;
+  display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px;
   padding: 24px 0 8px; margin: 0; list-style: none;
 }
 .cat {
@@ -329,6 +329,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .chip[data-cat="plumas"] { background: #fde6f2; color: #a0145e; }
 .chip[data-cat="piedreria"] { background: #e3f6f8; color: #0a6b74; }
 .chip[data-cat="trajes"] { background: #f0e8ff; color: #5a2db5; }
+.chip[data-cat="tocados"] { background: #ffe3f0; color: #b3105a; }
 .chip[data-cat="armazones"] { background: #fff1d6; color: #8a5300; }
 .chip[data-cat="zapatos"] { background: #ffe5e0; color: #a8341c; }
 

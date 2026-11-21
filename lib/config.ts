@@ -2,7 +2,8 @@ export const CATEGORIES = [
   { slug: "plumas", label: "Plumas", hint: "Faisán, pavo real, avestruz, marabú" },
   { slug: "piedreria", label: "Piedrería", hint: "Strass, cristales, apliques, cadenas" },
   { slug: "trajes", label: "Trajes", hint: "Completos o por partes" },
-  { slug: "armazones", label: "Armazones", hint: "Espaldares, tocados, coronas" },
+  { slug: "tocados", label: "Tocados", hint: "Cabezales, coronas, vinchas" },
+  { slug: "armazones", label: "Armazones", hint: "Espaldares y estructuras" },
   { slug: "zapatos", label: "Zapatos", hint: "Botas, sandalias, plataformas" },
   { slug: "otros", label: "Otros", hint: "Todo lo demás del desfile" },
 ] as const;

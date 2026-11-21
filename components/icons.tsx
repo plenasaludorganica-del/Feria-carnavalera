@@ -11,6 +11,9 @@ export const IconGema = (p: P) => (
 export const IconTraje = (p: P) => (
   <svg {...base} {...p}><path d="M17 6c2 4 12 4 14 0l5 6-5 6 6 24H11l6-24-5-6 5-6Z" fill="#7a1fb0" fillOpacity=".25" /><path d="M15 26h18" /></svg>
 );
+export const IconTocado = (p: P) => (
+  <svg {...base} {...p}><path d="M10 34c2-10 7-16 14-16s12 6 14 16Z" fill="#e01f84" fillOpacity=".22" /><path d="M8 34h32" /><path d="M24 18V6M16 20 12 9M32 20l4-11" /><circle cx="24" cy="6" r="2" /><circle cx="12" cy="9" r="2" /><circle cx="36" cy="9" r="2" /><path d="M18 28l2 2 4-4 4 4 2-2" /></svg>
+);
 export const IconArmazon = (p: P) => (
   <svg {...base} {...p}><path d="M8 40c0-18 7-32 16-32s16 14 16 32" /><path d="M14 40c0-12 4-22 10-22s10 10 10 22" fill="#f5b83d" fillOpacity=".25" /><path d="M24 8v10M12 20l6 4M36 20l-6 4" /></svg>
 );
@@ -34,6 +37,7 @@ export const CATEGORY_ICONS = {
   plumas: IconPluma,
   piedreria: IconGema,
   trajes: IconTraje,
+  tocados: IconTocado,
   armazones: IconArmazon,
   zapatos: IconZapato,
   otros: IconBrillo,

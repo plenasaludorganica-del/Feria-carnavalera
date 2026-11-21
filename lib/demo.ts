@@ -27,7 +27,7 @@ export const DEMO_PRODUCTS: CatalogProduct[] = [
   },
   {
     id: "demo-4", title: "Tocado de destaque masculino con espaldar", price: 210000, currency: "ARS",
-    category: "armazones", condition: "usado", created_at: now,
+    category: "tocados", condition: "usado", created_at: now,
     description: "Armazón de alambre y goma eva, con plumas y apliques. Se desarma para transportar.",
     images: ["/brand/comparsero.webp"], seller_id: "demo-lucas", seller_name: "Lucas P.", seller_city: "Concordia", whatsapp: "5493454000000",
   },
