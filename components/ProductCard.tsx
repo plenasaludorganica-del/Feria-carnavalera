@@ -4,9 +4,18 @@ import { categoryLabel, formatPrice, thumbUrl } from "@/lib/config";
 import type { CatalogItem } from "@/lib/types";
 import { IconBrillo } from "./icons";
 
-export default function ProductCard({ item, priority = false }: { item: CatalogItem; priority?: boolean }) {
-  return (
-    <Link href={`/producto/${item.id}`} className="tag">
+export default function ProductCard({
+  item,
+  priority = false,
+  href,
+}: {
+  item: CatalogItem;
+  priority?: boolean;
+  /** null = tarjeta sin enlace (vista previa del puesto) */
+  href?: string | null;
+}) {
+  const body = (
+    <>
       <div className="tag-photo">
         {item.cover ? (
           <Image
@@ -28,6 +37,12 @@ export default function ProductCard({ item, priority = false }: { item: CatalogI
           {item.city && <span>{item.city}</span>}
         </div>
       </div>
-    </Link>
+    </>
+  );
+  const to = href === undefined ? `/producto/${item.id}` : href;
+  return to ? (
+    <Link href={to} className="tag" data-fx="tag">{body}</Link>
+  ) : (
+    <div className="tag" data-fx="tag">{body}</div>
   );
 }

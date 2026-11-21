@@ -32,6 +32,7 @@ export interface CatalogItem {
 export interface CatalogProduct extends Omit<CatalogItem, "cover" | "city" | "total"> {
   description: string;
   images: string[];
+  seller_id: string;
   seller_name: string;
   seller_city: string | null;
   whatsapp: string;

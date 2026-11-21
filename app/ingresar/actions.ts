@@ -47,7 +47,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
     }
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
     if (loginError) return { error: "La cuenta se creó, pero no pudimos iniciar sesión. Probá ingresar." };
-    redirect("/suscripcion");
+    redirect("/panel?bienvenida=1");
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -55,11 +55,11 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
     password,
     options: {
       data: { display_name: name },
-      emailRedirectTo: `${await getSiteUrl()}/auth/callback?next=/suscripcion`,
+      emailRedirectTo: `${await getSiteUrl()}/auth/callback?next=/panel`,
     },
   });
   if (error) return { error: error.message.includes("registered") ? "Ese email ya tiene cuenta. Ingresá con tu contraseña." : error.message };
   // Si la confirmación por email está desactivada ya hay sesión: directo al pago.
-  if (data.session) redirect("/suscripcion");
-  return { info: `Te mandamos un email a ${email}. Abrí el enlace para confirmar tu cuenta y seguir con el pago.` };
+  if (data.session) redirect("/panel?bienvenida=1");
+  return { info: `Te mandamos un email a ${email}. Abrí el enlace para confirmar tu cuenta y armar tu puesto.` };
 }

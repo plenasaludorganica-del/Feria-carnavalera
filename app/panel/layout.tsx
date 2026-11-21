@@ -5,7 +5,10 @@ import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-/** Puerta del panel: sin cuota al día → pantalla de pago/renovación. */
+/**
+ * Puerta del panel. El vendedor entra aunque no haya pagado: arma su puesto,
+ * lo ve en vista previa y recién ahí paga. Solo una cuenta suspendida va al aviso.
+ */
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   if (!supabaseConfigured) {
     return (
@@ -19,7 +22,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     );
   }
   const { state } = await requireUser("/panel");
-  if (state !== "activo") redirect("/suscripcion");
+  if (state === "suspendido") redirect("/suscripcion");
   return (
     <>
       <SiteHeader />

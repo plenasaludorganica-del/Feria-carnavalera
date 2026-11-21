@@ -25,7 +25,7 @@ export default async function Ingresar({ searchParams }: { searchParams: Promise
             </h1>
             <p className="sub">
               {mode === "registro"
-                ? "Creás tu cuenta, pagás la cuota del mes por Mercado Pago y empezás a publicar."
+                ? "Creás tu cuenta, armás tu puesto con fotos y precios, mirás cómo queda y recién ahí lo publicás."
                 : "Para publicar, editar tus productos o renovar la cuota."}
             </p>
             <AuthForm mode={mode} next={next} />

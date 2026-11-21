@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { OwnProduct } from "@/lib/types";
 import { saveProduct, type FormState } from "./actions";
 
-const MAX_PHOTOS = 8;
+const MAX_PHOTOS = 5; // máximo por publicación (también lo controla la base de datos)
 
 /** Achica la foto en el navegador (WebP) antes de subirla: menos datos, carga más rápida. */
 async function compress(file: File, max: number): Promise<Blob> {
@@ -77,7 +77,7 @@ export default function ProductForm({ userId, product }: { userId: string; produ
             </label>
           )}
         </div>
-        <span className="help">La primera foto es la portada del producto.</span>
+        <span className="help">Hasta 5 fotos del mismo insumo (por ejemplo, la misma bota desde distintos ángulos). La primera es la portada.</span>
         {uploadError && <p className="form-error">{uploadError}</p>}
       </div>
 

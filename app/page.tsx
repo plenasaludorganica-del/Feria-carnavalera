@@ -37,7 +37,7 @@ export default async function Home() {
         </div>
         <SparkleRain className="hero-sparkles" />
 
-        <div className="hero-content">
+        <div className="hero-content" data-hero-content>
           <h1 className="wordmark" style={{ margin: 0 }}>
             <BrandWordmark />
           </h1>
@@ -57,7 +57,7 @@ export default async function Home() {
       <main className="sheet" id="buscar">
         <div className="sheet-feathers" data-depth="-0.12" aria-hidden="true" />
         <div className="wrap">
-          <div className="search-block">
+          <div className="search-block" data-fx="rise">
             <SearchBar />
           </div>
           <CategoryNav />
@@ -85,23 +85,23 @@ export default async function Home() {
           <section className="section" aria-labelledby="como">
             <div className="section-head"><h2 id="como">Cómo vender en la feria</h2></div>
             <ol className="steps">
-              <li>
+              <li data-fx="rise">
                 <h3>Creá tu cuenta</h3>
                 <p>Con tu email. Te lleva un minuto.</p>
               </li>
-              <li>
-                <h3>Pagá la cuota del mes</h3>
-                <p>Por Mercado Pago. Vence el último día de cada mes.</p>
+              <li data-fx="rise">
+                <h3>Armá tu puesto</h3>
+                <p>Subí hasta 5 fotos por insumo, poné precio y mirá cómo queda antes de publicarlo.</p>
               </li>
-              <li>
-                <h3>Publicá y recibí mensajes</h3>
-                <p>Subí fotos y precio. Los compradores te escriben directo a tu WhatsApp.</p>
+              <li data-fx="rise">
+                <h3>Publicalo y recibí mensajes</h3>
+                <p>Cuando te guste, activás la cuota mensual y los compradores te escriben a tu WhatsApp.</p>
               </li>
             </ol>
           </section>
 
           <section className="section">
-            <div className="cta-band">
+            <div className="cta-band" data-fx="rise">
               <div>
                 <h2>¿Te quedaron plumas del último corso?</h2>
                 <p>Hay comparsas armando el próximo carnaval que las están buscando.</p>

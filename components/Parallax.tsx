@@ -14,6 +14,7 @@ export default function Parallax() {
     const layers = Array.from(document.querySelectorAll<HTMLElement>("[data-depth]"));
     const stage = document.querySelector<HTMLElement>("[data-tilt]");
     const header = document.querySelector<HTMLElement>(".site-header");
+    const hero = document.querySelector<HTMLElement>(".hero");
     const finePointer = window.matchMedia("(pointer: fine)").matches;
 
     let target = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
@@ -30,6 +31,8 @@ export default function Parallax() {
         el.style.setProperty("--y", (sy * depth).toFixed(1));
       }
       if (header) header.dataset.solid = String(sy > vh * 0.6);
+      // 0 → 1 mientras el telón tapa la portada: maneja el 3D del título y las figuras
+      if (hero && sy <= vh * 1.2) hero.style.setProperty("--p", Math.min(sy / vh, 1).toFixed(3));
     };
     const onScroll = () => {
       if (!scheduled) { scheduled = true; requestAnimationFrame(apply); }

@@ -29,7 +29,7 @@ export default function AuthForm({ mode, next }: { mode: "ingreso" | "registro";
         {mode === "registro" && <span className="help">Mínimo 8 caracteres.</span>}
       </div>
       <button className="btn btn-fucsia" style={{ width: "100%" }} disabled={pending}>
-        {pending ? "Un momento…" : mode === "registro" ? "Crear cuenta y seguir al pago" : "Ingresar"}
+        {pending ? "Un momento…" : mode === "registro" ? "Crear cuenta y armar mi puesto" : "Ingresar"}
       </button>
     </form>
   );

@@ -11,5 +11,7 @@ const config: NextConfig = {
 
 export default config;
 
-// Permite usar las variables/bindings de Cloudflare en `npm run dev`
-import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());
+// Permite usar las variables/bindings de Cloudflare en `npm run dev` (solo en desarrollo)
+if (process.env.NODE_ENV === "development") {
+  import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());
+}

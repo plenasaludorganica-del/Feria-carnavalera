@@ -17,7 +17,7 @@ export default function CategoryNav({ current, q }: { current?: string; q?: stri
           const Icon = CATEGORY_ICONS[c.slug];
           return (
             <li key={c.slug}>
-              <Link href={qs(c.slug)} className="cat" aria-current={current === c.slug ? "page" : undefined}>
+              <Link href={qs(c.slug)} className="cat" data-fx="flip" aria-current={current === c.slug ? "page" : undefined}>
                 <Icon />
                 <span>
                   {c.label}
@@ -28,7 +28,7 @@ export default function CategoryNav({ current, q }: { current?: string; q?: stri
           );
         })}
         <li>
-          <Link href={qs()} className="cat" aria-current={current === "" ? "page" : undefined}>
+          <Link href={qs()} className="cat" data-fx="flip" aria-current={current === "" ? "page" : undefined}>
             <IconTodo />
             <span>
               Ver todo

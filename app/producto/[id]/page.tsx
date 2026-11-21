@@ -54,6 +54,7 @@ export default async function Producto({ params }: { params: Params }) {
               <div className="seller-box">
                 <strong>{p.seller_name}</strong>
                 {p.seller_city ?? "Ciudad sin especificar"}
+                <Link href={`/puesto/${p.seller_id}`} className="seller-link">Ver todo lo que vende</Link>
               </div>
 
               {p.description && (

@@ -62,3 +62,8 @@ export function normalizeWhatsapp(raw: string) {
 export function thumbUrl(src: string) {
   return src.includes("/product-images/") && src.endsWith(".webp") ? src.replace(/\.webp$/, "_t.webp") : src;
 }
+
+export function whatsappStandLink(number: string, sellerName: string) {
+  const text = `¡Hola ${sellerName}! Vi tu puesto en la Feria del Comparsero.`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}

@@ -35,3 +35,24 @@ export async function getProduct(id: string): Promise<CatalogProduct | null> {
   const { data } = await supabase.rpc("get_catalog_product", { pid: id });
   return (data?.[0] as CatalogProduct | undefined) ?? null;
 }
+
+export async function getStand(sellerId: string) {
+  if (!supabaseConfigured) {
+    const own = DEMO_PRODUCTS.filter((p) => p.seller_id === sellerId);
+    if (!own.length) return null;
+    return {
+      seller: { name: own[0].seller_name, city: own[0].seller_city, whatsapp: own[0].whatsapp, soldCount: 3 },
+      items: own.map((p) => ({ ...p, cover: p.images[0] ?? null, city: p.seller_city })) as CatalogItem[],
+    };
+  }
+  if (!/^[0-9a-f-]{36}$/i.test(sellerId)) return null;
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("get_seller_stand", { sid: sellerId });
+  const rows = (data ?? []) as (CatalogItem & { seller_name: string; seller_city: string | null; whatsapp: string; sold_count: number })[];
+  if (!rows.length) return null;
+  const r0 = rows[0];
+  return {
+    seller: { name: r0.seller_name, city: r0.seller_city, whatsapp: r0.whatsapp, soldCount: r0.sold_count ?? 0 },
+    items: rows.filter((r) => r.id).map((r) => ({ ...r, city: r0.seller_city })) as CatalogItem[],
+  };
+}

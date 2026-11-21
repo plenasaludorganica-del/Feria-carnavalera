@@ -40,7 +40,7 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
   if (!images.length) return { error: "Subí al menos una foto: es lo primero que miran los compradores." };
 
   const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${user.id}/`;
-  images = images.filter((u) => typeof u === "string" && u.startsWith(prefix)).slice(0, 8);
+  images = images.filter((u) => typeof u === "string" && u.startsWith(prefix)).slice(0, 5);
 
   const row = {
     title: title.slice(0, 90),
@@ -56,7 +56,7 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
     : await supabase.from("products").insert({ ...row, seller_id: user.id });
   if (error) {
     console.error(error);
-    return { error: "No se pudo guardar. Revisá que tengas tu WhatsApp cargado y la cuota al día." };
+    return { error: "No se pudo guardar. Revisá que tengas tu WhatsApp cargado en “Tus datos de contacto”." };
   }
   revalidatePath("/panel");
   revalidatePath("/");
