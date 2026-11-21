@@ -1028,3 +1028,20 @@ html, body { overflow-x: clip; }
 .fb-kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f3eefa; padding: 4px; border-radius: 12px; }
 .fb-kinds button { border: 0; border-radius: 9px; padding: .65rem .5rem; background: transparent; font-weight: 700; color: var(--tinta-suave); cursor: pointer; }
 .fb-kinds button[aria-checked="true"] { background: #fff; color: var(--tinta); box-shadow: 0 0 0 2px var(--neon), 0 0 14px #e0115f55; }
+
+/* ---------- Precio promocional ---------- */
+.promo { display: grid; justify-items: center; gap: 4px; margin-top: 12px; }
+.promo-flag {
+  display: inline-block; padding: 6px 14px; border-radius: 999px;
+  background: linear-gradient(180deg, #ff3d8a, #e0115f); color: #fff; font-weight: 800; font-size: .9rem;
+  box-shadow: 0 0 16px #e0115f99; animation: promo-pop 1.8s ease-in-out infinite;
+}
+@keyframes promo-pop { 50% { transform: scale(1.05); box-shadow: 0 0 26px #e0115fcc; } }
+.promo-prices { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.promo-old { color: var(--tinta-suave); font-size: 1.3rem; font-weight: 700; text-decoration-thickness: 2px; text-decoration-color: #c4002f; }
+.promo-off {
+  display: inline-block; padding: 3px 10px; border-radius: 8px; background: #ffe45c; color: #3d0a22;
+  font-weight: 900; font-size: .95rem; box-shadow: 0 0 0 2px #3d0a22;
+}
+.promo .pay-amount { margin: 0; color: #c4002f; }
+.promo-note { color: var(--tinta-suave); }

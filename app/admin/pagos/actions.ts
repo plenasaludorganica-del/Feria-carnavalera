@@ -1,6 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { getMe, updatePreapprovalAmount } from "@/lib/mercadopago";
+import { getChargePrice, getMe, updatePreapprovalAmount } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 
 export type PagosState = { ok?: string; error?: string };
@@ -47,7 +47,12 @@ export async function savePrice(_: PagosState, form: FormData): Promise<PagosSta
   const { error } = await supabase.rpc("admin_set_setting", { p_key: "monthly_price", p_value: String(price) });
   if (error) return { error: "No se pudo guardar el precio." };
 
-  // Actualiza el monto a quienes ya tienen débito automático activo
+  return { ok: "Precio normal guardado." + (await syncSubscriptions(supabase)) };
+}
+
+/** Pone a todos los débitos automáticos activos en el precio que se cobra hoy (promo o normal). */
+async function syncSubscriptions(supabase: Awaited<ReturnType<typeof requireAdmin>>["supabase"]) {
+  const amount = await getChargePrice();
   const { data: subs } = await supabase
     .from("profiles")
     .select("mp_preapproval_id")
@@ -55,11 +60,34 @@ export async function savePrice(_: PagosState, form: FormData): Promise<PagosSta
     .not("mp_preapproval_id", "is", null);
   let updated = 0;
   for (const s of subs ?? []) {
-    try { await updatePreapprovalAmount(s.mp_preapproval_id as string, price); updated++; } catch (e) { console.error("[precio]", e); }
+    try { await updatePreapprovalAmount(s.mp_preapproval_id as string, amount); updated++; } catch (e) { console.error("[precio]", e); }
   }
   revalidatePath("/admin/pagos");
   revalidatePath("/suscripcion");
-  return { ok: `Precio guardado.${updated ? ` Se actualizó en ${updated} débito${updated === 1 ? "" : "s"} automático${updated === 1 ? "" : "s"}.` : ""}` };
+  return updated ? ` Se actualizó en ${updated} débito${updated === 1 ? "" : "s"} automático${updated === 1 ? "" : "s"}.` : "";
+}
+
+export async function savePromo(_: PagosState, form: FormData): Promise<PagosState> {
+  const { supabase } = await requireAdmin();
+  const raw = String(form.get("promo") ?? "").replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, "");
+  const promo = Number(raw);
+  if (!Number.isFinite(promo) || promo <= 0) return { error: "Escribí el precio promocional solo con números, por ejemplo 1999." };
+  const { error } = await supabase.rpc("admin_set_setting", { p_key: "promo_price", p_value: String(promo) });
+  if (error) return { error: "No se pudo guardar la promo." };
+  revalidatePath("/admin/pagos");
+  revalidatePath("/suscripcion");
+  return { ok: "Promo activada: ya se muestra tachado el precio normal y se cobra la promo." };
+}
+
+export async function endPromo(_: PagosState, form: FormData): Promise<PagosState> {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.rpc("admin_set_setting", { p_key: "promo_price", p_value: "" });
+  if (error) return { error: "No se pudo quitar la promo." };
+  let extra = "";
+  if (form.get("update_subs") === "on") extra = await syncSubscriptions(supabase);
+  revalidatePath("/admin/pagos");
+  revalidatePath("/suscripcion");
+  return { ok: "Promo terminada: desde ahora se cobra el precio normal." + extra };
 }
 
 export async function testConnection(_: PagosState): Promise<PagosState> {

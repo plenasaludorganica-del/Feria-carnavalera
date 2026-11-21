@@ -1,7 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import PasswordInput from "@/components/PasswordInput";
-import { saveToken, savePrice, saveWebhookSecret, testConnection, type PagosState } from "./actions";
+import { endPromo, savePromo, saveToken, savePrice, saveWebhookSecret, testConnection, type PagosState } from "./actions";
 
 function Msg({ s }: { s: PagosState }) {
   if (s.error) return <p className="form-error" role="alert">{s.error}</p>;
@@ -32,7 +32,7 @@ export function PriceForm({ current }: { current: number | null }) {
   const [s, action, pending] = useActionState<PagosState, FormData>(savePrice, {});
   return (
     <form action={action} className="paper">
-      <h2>Precio de la cuota mensual</h2>
+      <h2>Precio normal de la cuota mensual</h2>
       <p className="sub">{current ? `Ahora: $ ${current.toLocaleString("es-AR")} por mes.` : "Todavía no definiste el precio."}</p>
       <Msg s={s} />
       <div className="field">
@@ -42,6 +42,40 @@ export function PriceForm({ current }: { current: number | null }) {
       </div>
       <button className="btn btn-oro" disabled={pending}>{pending ? "Guardando…" : "Guardar precio"}</button>
     </form>
+  );
+}
+
+export function PromoForm({ regular, promo }: { regular: number | null; promo: number | null }) {
+  const [s, action, pending] = useActionState<PagosState, FormData>(savePromo, {});
+  const [e, endAction, ending] = useActionState<PagosState, FormData>(endPromo, {});
+  const half = regular ? Math.round(regular / 2) - (Math.round(regular / 2) % 10 === 0 ? 1 : 0) : "";
+  return (
+    <div className="paper">
+      <h2>Precio promocional</h2>
+      <p className="sub">
+        {promo
+          ? `Activa: se cobra $ ${promo.toLocaleString("es-AR")} y se muestra tachado el precio normal${regular ? ` ($ ${regular.toLocaleString("es-AR")})` : ""}.`
+          : "Sin promo. Se cobra el precio normal."}
+      </p>
+      <Msg s={s} /><Msg s={e} />
+      <form action={action}>
+        <div className="field">
+          <label htmlFor="promo">Precio promocional en pesos</label>
+          <input className="input" id="promo" name="promo" inputMode="numeric" defaultValue={promo ?? half} required />
+          <span className="help">La pantalla de pago muestra el precio normal tachado, el % de descuento y “Aprovechá hoy el precio promocional”.</span>
+        </div>
+        <button className="btn btn-oro" disabled={pending}>{pending ? "Guardando…" : promo ? "Cambiar promo" : "Activar promo"}</button>
+      </form>
+      {promo && (
+        <form action={endAction} style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--linea)" }}>
+          <label style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 10, fontSize: ".92rem" }}>
+            <input type="checkbox" name="update_subs" style={{ marginTop: 4 }} />
+            <span>Pasar también al precio normal a quienes ya tienen débito automático con la promo (si no lo tildás, ellos siguen pagando la promo).</span>
+          </label>
+          <button className="btn btn-peligro" disabled={ending}>{ending ? "Terminando…" : "Terminar promo"}</button>
+        </form>
+      )}
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import { formatDate, formatPrice } from "@/lib/config";
 import ShareCard from "@/components/ShareCard";
-import { getMonthlyPrice } from "@/lib/mercadopago";
+import { getMonthlyPrice, getPromoPrice } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 import { addMonthISO, daysLeft, todayISO } from "@/lib/subscription";
 
@@ -13,7 +13,10 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
   const { error } = await searchParams;
   const { profile, state, user } = await requireUser("/suscripcion");
   // Se leen en cada request (en Cloudflare las variables llegan con la petición).
-  const price = await getMonthlyPrice();
+  const regular = await getMonthlyPrice();
+  const promo = await getPromoPrice();
+  const price = promo ?? regular;
+  const off = promo ? Math.round((1 - promo / regular) * 100) : 0;
   const currency = process.env.MP_CURRENCY ?? "ARS";
 
   // Hasta qué fecha cubriría este pago (misma regla que register_payment en SQL)
@@ -64,10 +67,21 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
 
             {state !== "suspendido" && !(state === "activo" && profile.is_free) && profile.mp_preapproval_status !== "authorized" && (
               <>
-                <p className="pay-amount">{formatPrice(price, currency)} <small>por mes</small></p>
+                {promo ? (
+                  <div className="promo">
+                    <span className="promo-flag">Aprovechá hoy el precio promocional</span>
+                    <div className="promo-prices">
+                      <s className="promo-old">{formatPrice(regular, currency)}</s>
+                      <span className="promo-off">{off}% OFF</span>
+                    </div>
+                    <p className="pay-amount">{formatPrice(price, currency)} <small>por mes</small></p>
+                    <small className="promo-note">Precio de lanzamiento por tiempo limitado.</small>
+                  </div>
+                ) : (
+                  <p className="pay-amount">{formatPrice(price, currency)} <small>por mes</small></p>
+                )}
                 <ul className="pay-list">
                   <li>Se cobra hoy y después solo, todos los meses el día {Number(today.slice(8, 10))}, con tu tarjeta por Mercado Pago.</li>
-                  <li>El primer cobro es proporcional a los días que quedan de este mes.</li>
                   <li>Publicaciones ilimitadas con hasta 8 fotos cada una. Te escriben directo a tu WhatsApp.</li>
                   <li>Podés darlo de baja cuando quieras desde tu panel. Tus productos se ocultan, no se borran.</li>
                 </ul>

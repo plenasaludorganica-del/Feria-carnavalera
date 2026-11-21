@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import { requireUser } from "@/lib/session";
 import { getSiteUrl } from "@/lib/site-url";
-import { PriceForm, TestButton, TokenForm, WebhookForm } from "./Forms";
+import { PriceForm, PromoForm, TestButton, TokenForm, WebhookForm } from "./Forms";
 
 export const metadata: Metadata = { title: "Pagos" };
 export const dynamic = "force-dynamic";
@@ -13,9 +13,10 @@ export default async function Pagos() {
   const { profile, supabase } = await requireUser("/admin/pagos");
   if (profile.role !== "admin") notFound();
 
-  const [{ data: status }, { data: price }] = await Promise.all([
+  const [{ data: status }, { data: price }, { data: promo }] = await Promise.all([
     supabase.rpc("admin_secret_status"),
     supabase.rpc("get_monthly_price"),
+    supabase.rpc("get_promo_price"),
   ]);
   const rows = (status ?? []) as { name: string; configured: boolean; last4: string | null }[];
   const token = rows.find((r) => r.name === "mp_access_token");
@@ -32,6 +33,7 @@ export default async function Pagos() {
           <div style={{ display: "grid", gap: 20 }}>
             <TokenForm configured={Boolean(token?.configured)} last4={token?.last4 ?? null} />
             <PriceForm current={price ? Number(price) : null} />
+            <PromoForm regular={price ? Number(price) : null} promo={promo ? Number(promo) : null} />
             <TestButton />
             <WebhookForm configured={Boolean(hook?.configured)} url={webhookUrl} />
           </div>

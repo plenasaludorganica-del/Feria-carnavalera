@@ -36,6 +36,18 @@ export async function getMonthlyPrice(): Promise<number> {
   return Number(process.env.MP_MONTHLY_PRICE ?? 5000);
 }
 
+/** Precio promocional (si está activo). */
+export async function getPromoPrice(): Promise<number | null> {
+  if (!hasServiceKey()) return null;
+  const { data } = await createAdminClient().rpc("get_promo_price");
+  return data ? Number(data) : null;
+}
+
+/** Lo que se cobra hoy: la promo si está activa, si no el precio normal. */
+export async function getChargePrice(): Promise<number> {
+  return (await getPromoPrice()) ?? (await getMonthlyPrice());
+}
+
 export const currency = () => process.env.MP_CURRENCY ?? "ARS";
 
 async function mp<T>(path: string, init?: RequestInit): Promise<T> {
@@ -68,7 +80,7 @@ export async function createSubscriptionPreference(args: { userId: string; email
           id: "cuota-mensual",
           title: "Feria del Comparsero — cuota mensual de vendedor",
           quantity: 1,
-          unit_price: await getMonthlyPrice(),
+          unit_price: await getChargePrice(),
           currency_id: currency(),
         },
       ],
@@ -167,7 +179,7 @@ export async function createPreapproval(args: { userId: string; email: string; s
     back_url: `${args.siteUrl}/suscripcion/resultado`,
     status: "pending", // el vendedor autoriza su tarjeta en Mercado Pago
   };
-  const auto = { frequency: 1, frequency_type: "months", transaction_amount: await getMonthlyPrice(), currency_id: currency() };
+  const auto = { frequency: 1, frequency_type: "months", transaction_amount: await getChargePrice(), currency_id: currency() };
   return mp<MPPreapproval>("/preapproval", { method: "POST", body: JSON.stringify({ ...base, auto_recurring: auto }) });
 }
 

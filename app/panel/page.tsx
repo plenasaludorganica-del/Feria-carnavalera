@@ -3,6 +3,7 @@ import Link from "next/link";
 import ConfirmButton from "@/components/ConfirmButton";
 import ShareCard from "@/components/ShareCard";
 import { categoryLabel, formatDate, formatPrice, thumbUrl } from "@/lib/config";
+import { getPromoPrice } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
 import type { OwnProduct } from "@/lib/types";
@@ -24,6 +25,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
   const copy = STATE_COPY[state];
   const left = daysLeft(profile.paid_until);
   const free = Boolean(profile.is_free) && live;
+  const promo = live ? null : await getPromoPrice();
 
   const hasContact = Boolean(profile.whatsapp);
   const hasProducts = products.some((p) => p.status === "active");
@@ -93,6 +95,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             <li data-done={false}>
               <strong>{state === "vencido" ? "Renová y publicá" : "Publicá tu puesto"}</strong>
               <span>Pagás la cuota con Mercado Pago y tu puesto aparece en la feria.</span>
+              {promo && <span className="promo-off">¡Precio promocional!</span>}
               {ready ? (
                 <Link href="/suscripcion" className="btn btn-oro btn-sm">
                   {state === "vencido" ? "Renovar y publicar" : "Pagar y publicar"}
