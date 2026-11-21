@@ -90,8 +90,8 @@ El sitio corre en **Cloudflare Workers** con el adaptador OpenNext (`wrangler.js
 
 1. En Cloudflare, entrá a **Workers & Pages → Create → Import a repository** y elegí `feria-carnavalera`.
 2. Configurá el build:
-   - **Build command**: `npx opennextjs-cloudflare build`
-   - **Deploy command**: `npx opennextjs-cloudflare deploy`
+   - **Build command**: `npm run build`. Arma la versión para Cloudflare.
+   - **Deploy command**: `npx opennextjs-cloudflare deploy`. También sirve `npx wrangler deploy`.
 3. Cargá las **variables de build** (Build → Variables). Las `NEXT_PUBLIC_*` se incrustan al compilar:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
