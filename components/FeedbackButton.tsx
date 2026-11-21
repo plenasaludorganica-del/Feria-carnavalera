@@ -3,7 +3,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { sendFeedback, type FeedbackState } from "@/app/feedback-actions";
 
 /** Botón al costado + ventanita para dejar una opinión anónima con estrellas. */
-export default function FeedbackButton() {
+export default function FeedbackButton({ supportWhatsapp }: { supportWhatsapp?: string }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -11,6 +11,14 @@ export default function FeedbackButton() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [page, setPage] = useState("");
   useEffect(() => setPage(window.location.pathname), []);
+  // Cualquier elemento con data-open-feedback (ej. "Ayuda" del pie) abre la ventanita
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest("[data-open-feedback]")) setOpen(true);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
   useEffect(() => {
     const d = dialogRef.current;
@@ -26,7 +34,8 @@ export default function FeedbackButton() {
     <>
       <button type="button" className="fb-tab" onClick={() => setOpen(true)} aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" /></svg>
-        <span>¿Qué le falta a la feria?</span>
+        <span className="fb-tab-long">Ayuda y opiniones</span>
+        <span className="fb-tab-short">Ayuda</span>
       </button>
 
       <dialog ref={dialogRef} className="fb-dialog" onClose={() => setOpen(false)} onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
@@ -39,7 +48,18 @@ export default function FeedbackButton() {
         ) : (
           <form action={action} className="fb-body">
             <button type="button" className="fb-close" aria-label="Cerrar" onClick={() => setOpen(false)}>×</button>
-            <h2>Ayudanos a mejorar la feria</h2>
+            <h2>¿En qué te ayudamos?</h2>
+            {supportWhatsapp && (
+              <a
+                className="btn btn-whatsapp fb-support"
+                href={`https://wa.me/${supportWhatsapp}?text=${encodeURIComponent("Hola, tengo una consulta sobre la Feria del Comparsero.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Tengo un problema: escribir por WhatsApp
+              </a>
+            )}
+            <div className="fb-sep"><span>o dejanos tu opinión para mejorar</span></div>
             <p className="fb-sub">Es anónimo: no guardamos quién lo manda y no se publica.</p>
 
             <fieldset className="fb-stars" onMouseLeave={() => setHover(0)}>

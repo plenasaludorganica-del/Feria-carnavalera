@@ -1015,3 +1015,13 @@ html, body { overflow-x: clip; }
 .btn-gratis { background: #138a5b; color: #fff; box-shadow: 0 0 12px #138a5b66; }
 .btn-gratis:hover { background: #0f7a50; }
 .badge-gratis { background: #138a5b; color: #fff; }
+.fb-tab-short { display: none; }
+@media (max-width: 760px) {
+  .fb-tab { padding: 10px 14px; gap: 6px; font-size: .9rem; }
+  .fb-tab span.fb-tab-long { display: none; }
+  .fb-tab span.fb-tab-short { display: inline; }
+}
+.fb-support { min-height: 50px; font-size: 1rem; }
+.fb-sep { display: flex; align-items: center; gap: 10px; color: var(--tinta-suave); font-size: .85rem; }
+.fb-sep::before, .fb-sep::after { content: ""; flex: 1; height: 1px; background: var(--linea); }
+.linklike { border: 0; background: none; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }

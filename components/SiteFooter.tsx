@@ -8,6 +8,7 @@ export default function SiteFooter() {
         <p style={{ margin: 0, display: "flex", gap: 16 }}>
           <Link href="/catalogo">Catálogo</Link>
           <Link href="/ingresar?modo=registro">Vender en la feria</Link>
+          <button type="button" className="linklike" data-open-feedback>Ayuda</button>
         </p>
       </div>
     </footer>
