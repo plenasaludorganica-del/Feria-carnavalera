@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
     if (profile.mp_preapproval_status === "authorized") {
       return NextResponse.redirect(new URL("/panel", req.url), 303); // ya tiene débito activo
     }
-    const sub = await createPreapproval({ userId: user.id, email: user.email!, siteUrl });
+    const form = await req.formData().catch(() => null);
+    const mpEmail = String(form?.get("mp_email") ?? "").trim();
+    const payerEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mpEmail) ? mpEmail : user.email!;
+    const sub = await createPreapproval({ userId: user.id, email: payerEmail, siteUrl });
     if (!sub.init_point) throw new Error("Mercado Pago no devolvió init_point");
     return NextResponse.redirect(sub.init_point, 303);
   } catch (e) {

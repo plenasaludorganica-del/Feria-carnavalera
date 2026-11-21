@@ -33,9 +33,11 @@ export default async function MiPuesto() {
           {live ? (
             <Link href={`/puesto/${user.id}`} className="btn btn-oro btn-sm">Ver mi puesto público</Link>
           ) : (
-            <form action="/api/mp/checkout" method="post">
-              <button className="btn btn-oro btn-sm" disabled={!profile.whatsapp || !items.length}>Pagar y publicar</button>
-            </form>
+            profile.whatsapp && items.length ? (
+              <Link href="/suscripcion" className="btn btn-oro btn-sm">Pagar y publicar</Link>
+            ) : (
+              <button className="btn btn-oro btn-sm" disabled>Pagar y publicar</button>
+            )
           )}
         </div>
       </div>

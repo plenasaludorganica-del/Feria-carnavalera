@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Cuota mensual" };
 
 export default async function Suscripcion({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
-  const { profile, state } = await requireUser("/suscripcion");
+  const { profile, state, user } = await requireUser("/suscripcion");
   // Se leen en cada request (en Cloudflare las variables llegan con la petición).
   const price = Number(process.env.MP_MONTHLY_PRICE ?? 5000);
   const currency = process.env.MP_CURRENCY ?? "ARS";
@@ -62,7 +62,12 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
                   <li>Publicaciones ilimitadas con hasta 8 fotos cada una. Te escriben directo a tu WhatsApp.</li>
                   <li>Podés darlo de baja cuando quieras desde tu panel. Tus productos se ocultan, no se borran.</li>
                 </ul>
-                <form action="/api/mp/checkout" method="post">
+                <form action="/api/mp/checkout" method="post" style={{ textAlign: "left" }}>
+                  <div className="field">
+                    <label htmlFor="mp_email">Email de tu cuenta de Mercado Pago</label>
+                    <input className="input" id="mp_email" name="mp_email" type="email" required defaultValue={user.email ?? ""} autoComplete="email" />
+                    <span className="help">Tiene que ser el mismo con el que entrás a Mercado Pago. Si usás otro, cambialo acá.</span>
+                  </div>
                   <button className="btn btn-oro hero-cta-main" style={{ width: "100%" }}>
                     Activar débito automático
                   </button>

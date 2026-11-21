@@ -63,11 +63,15 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             <li data-done={false}>
               <strong>{state === "vencido" ? "Renová y publicá" : "Publicá tu puesto"}</strong>
               <span>Pagás la cuota con Mercado Pago y tu puesto aparece en la feria.</span>
-              <form action="/api/mp/checkout" method="post">
-                <button className="btn btn-oro btn-sm" disabled={!ready}>
+              {ready ? (
+                <Link href="/suscripcion" className="btn btn-oro btn-sm">
+                  {state === "vencido" ? "Renovar y publicar" : "Pagar y publicar"}
+                </Link>
+              ) : (
+                <button className="btn btn-oro btn-sm" disabled>
                   {state === "vencido" ? "Renovar y publicar" : "Pagar y publicar"}
                 </button>
-              </form>
+              )}
               {!ready && <small>Primero completá los pasos 1 y 2.</small>}
             </li>
           </ol>
