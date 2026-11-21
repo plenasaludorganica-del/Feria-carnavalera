@@ -25,7 +25,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
       </div>
       <div className="field">
         <label htmlFor="city">Ciudad</label>
-        <input className="input" id="city" name="city" defaultValue={profile.city ?? ""} maxLength={60} placeholder="Gualeguaychú" />
+        <input className="input" id="city" name="city" defaultValue={profile.city ?? ""} maxLength={60} placeholder="Corrientes" />
       </div>
       <button className="btn btn-fucsia" disabled={pending} style={{ width: "100%" }}>
         {pending ? "Guardando…" : "Guardar datos"}
