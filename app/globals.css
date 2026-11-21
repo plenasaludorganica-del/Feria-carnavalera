@@ -847,3 +847,39 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
 .intro-mark .wordmark-temp {
   filter: drop-shadow(0 2px 0 #8a1450) drop-shadow(0 5px 0 #4a0a40) drop-shadow(0 0 28px #f5b83d99) drop-shadow(0 0 60px #e01f8466);
 }
+
+/* =========================================================
+   CELULAR: misma experiencia que en computadora
+   ========================================================= */
+@media (max-width: 760px) {
+  /* Puertas de plumas con más profundidad en pantalla angosta */
+  .intro-stage { perspective: 640px; }
+  .intro-panel { width: 58%; }
+
+  /* Contenido arriba, comparseros grandes abajo */
+  .hero-content { place-content: start center; padding-top: max(96px, 14svh); gap: 1.1rem; }
+  .hero-content .wordmark-temp { font-size: clamp(2.8rem, 14vw, 4.2rem); }
+  .hero-cta-main { min-height: 56px; }
+  .hero-ctas { flex-direction: column; align-items: stretch; width: min(100%, 320px); gap: .6rem; }
+  .hero-figure { width: 46vw; opacity: 1; bottom: -2%; }
+  .hero-figure-izq { left: -5vw; }
+  .hero-figure-der { right: -5vw; }
+  .hero-figure img { border-radius: 120px 120px 0 0; }
+  .hero-figure::before { border-radius: 126px 126px 0 0; }
+  /* velo para que los botones se lean sobre las figuras */
+  .hero-bg::after {
+    background:
+      radial-gradient(ellipse 90% 40% at 50% 34%, #1b0b3fc0 0%, #1b0b3f55 60%, transparent 85%),
+      linear-gradient(180deg, #1b0b3f99 0%, transparent 25%, transparent 55%, var(--noche) 100%);
+  }
+}
+
+/* Sin mouse: la portada se balancea sola en 3D (o sigue al giro del teléfono) */
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .hero-stage:not(.gyro) { animation: stage-sway 14s ease-in-out infinite alternate; }
+}
+@keyframes stage-sway {
+  0%   { transform: rotateX(1.5deg) rotateY(-3deg) scale(1.04); }
+  50%  { transform: rotateX(-1.5deg) rotateY(2deg) scale(1.06); }
+  100% { transform: rotateX(1deg) rotateY(3deg) scale(1.04); }
+}

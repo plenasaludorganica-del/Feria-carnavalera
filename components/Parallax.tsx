@@ -51,12 +51,22 @@ export default function Parallax() {
       if (!raf) raf = requestAnimationFrame(tilt);
     };
 
+    // Celular: la portada sigue el giro del teléfono (Android y navegadores que lo permiten sin pedir permiso)
+    const onTiltDevice = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null || window.scrollY > window.innerHeight) return;
+      if (stage && !stage.classList.contains("gyro")) stage.classList.add("gyro");
+      target = { x: Math.max(-1, Math.min(1, e.gamma / 25)) * 0.5, y: Math.max(-1, Math.min(1, (e.beta - 45) / 25)) * 0.5 };
+      if (!raf) raf = requestAnimationFrame(tilt);
+    };
+
     apply();
     window.addEventListener("scroll", onScroll, { passive: true });
     if (finePointer && stage) window.addEventListener("pointermove", onMove, { passive: true });
+    if (!finePointer && stage) window.addEventListener("deviceorientation", onTiltDevice, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("deviceorientation", onTiltDevice);
       cancelAnimationFrame(raf);
     };
   }, []);
