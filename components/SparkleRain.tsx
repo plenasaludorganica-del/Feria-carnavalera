@@ -46,7 +46,7 @@ export default function SparkleRain({ className }: { className?: string }) {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = false; // siempre animado
     const sprites = COLORS.flatMap((c) => [makeSprite(c, 32, false), makeSprite(c, 48, true)]);
     let w = 0, h = 0, dpr = 1;
     let parts: P[] = [];

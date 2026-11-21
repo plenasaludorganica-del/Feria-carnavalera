@@ -180,7 +180,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hero-cta-main { min-height: 64px; padding-inline: 2rem; font-size: clamp(1.05rem, 2.4vw, 1.3rem); }
 
 /* Entrada: una sola secuencia orquestada */
-@media (prefers-reduced-motion: no-preference) {
+@media all {
   .hero-bg img { animation: hero-zoom 2.4s cubic-bezier(.2,.7,.2,1) both; }
   .hero-figure-izq img { animation: hero-rise 1.4s .3s cubic-bezier(.2,.8,.2,1) both; }
   .hero-figure-der img { animation: hero-rise 1.4s .45s cubic-bezier(.2,.8,.2,1) both; }
@@ -503,9 +503,6 @@ table.admin td form { display: inline-flex; gap: 6px; align-items: center; }
   padding: 12px 16px; border-radius: 12px; background: #fff3dc; color: #6b4100; margin-bottom: 16px; font-size: .95rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-}
 
 /* =========================================================
    MOVIMIENTO 3D AL HACER SCROLL
@@ -526,9 +523,6 @@ table.admin td form { display: inline-flex; gap: 6px; align-items: center; }
 .hero-bg img { scale: calc(1 + var(--p) * .14); }
 .hero-sparkles { opacity: calc(1 - var(--p) * .6); }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-hero-content], .hero-figure, .hero-bg img { transform: none; translate: none; rotate: none; scale: none; opacity: 1; }
-}
 
 /* Entradas al aparecer en pantalla */
 .fx-on [data-fx] { transition-timing-function: cubic-bezier(.2, .85, .25, 1); }
@@ -788,7 +782,7 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
 
 /* Mientras el telón se abre, la portada espera y aparece sincronizada */
 html:not(.intro-off) .hero { --intro-delay: 1.15s; }
-@media (prefers-reduced-motion: no-preference) {
+@media all {
   .hero-bg img {
     animation:
       hero-zoom 2.6s var(--intro-delay, 0s) cubic-bezier(.2, .7, .2, 1) both,
@@ -817,7 +811,7 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
   background-position: 160% 0, 0 0;
   -webkit-background-clip: text; background-clip: text;
 }
-@media (prefers-reduced-motion: no-preference) {
+@media all {
   .hero-content .wordmark-temp span { animation: shine 6.5s calc(var(--intro-delay, 0s) + 1.6s) ease-in-out infinite; }
   .hero-content .wordmark-temp span + span { animation-delay: calc(var(--intro-delay, 0s) + 1.75s); }
 }
@@ -831,7 +825,7 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
 .fx-on [data-fx="title"].in { opacity: 1; clip-path: inset(0 0 -10% 0); transform: none; }
 
 /* El arco dorado se balancea junto con la foto */
-@media (prefers-reduced-motion: no-preference) {
+@media all {
   .hero-figure-izq::before { animation: bob 7s calc(var(--intro-delay, 0s) + 2s) ease-in-out infinite alternate; }
   .hero-figure-der::before { animation: bob 8s calc(var(--intro-delay, 0s) + 2.3s) ease-in-out infinite alternate-reverse; }
 }
@@ -875,7 +869,7 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
 }
 
 /* Sin mouse: la portada se balancea sola en 3D (o sigue al giro del teléfono) */
-@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+@media (pointer: coarse) {
   .hero-stage:not(.gyro) { animation: stage-sway 14s ease-in-out infinite alternate; }
 }
 @keyframes stage-sway {

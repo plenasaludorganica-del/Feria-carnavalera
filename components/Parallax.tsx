@@ -8,8 +8,6 @@ import { useEffect } from "react";
  */
 export default function Parallax() {
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
 
     const layers = Array.from(document.querySelectorAll<HTMLElement>("[data-depth]"));
     const stage = document.querySelector<HTMLElement>("[data-tilt]");

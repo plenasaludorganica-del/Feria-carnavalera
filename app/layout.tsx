@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var r=document.documentElement,m=matchMedia('(prefers-reduced-motion: reduce)').matches,s=null;try{s=sessionStorage.getItem('feria-intro')}catch(e){}if(!m)r.classList.add('fx-on');if(m||s)r.classList.add('intro-off')})()",
+              "(function(){var r=document.documentElement,q=/[?&]intro/.test(location.search),s=null;try{if(q)sessionStorage.removeItem('feria-intro');s=sessionStorage.getItem('feria-intro')}catch(e){}r.classList.add('fx-on');if(s&&!q)r.classList.add('intro-off')})()",
           }}
         />
       </head>
