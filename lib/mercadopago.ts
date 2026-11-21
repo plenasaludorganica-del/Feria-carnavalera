@@ -136,9 +136,8 @@ export async function verifySignature(opts: { signature: string | null; requestI
 
 /* =====================================================================
    DÉBITO AUTOMÁTICO (Suscripciones sin plan / "preapproval")
-   - Se cobra el día 1 de cada mes (billing_day = 1): la cuota vence el
-     último día del mes y se renueva sola al empezar el siguiente.
-   - El primer cobro es proporcional a los días que quedan del mes actual.
+   - El primer cobro es el día que el vendedor se suscribe y después se
+     cobra solo, todos los meses, ese mismo día (pagó un 21 → todos los 21).
    ===================================================================== */
 
 export interface MPPreapproval {
@@ -169,16 +168,7 @@ export async function createPreapproval(args: { userId: string; email: string; s
     status: "pending", // el vendedor autoriza su tarjeta en Mercado Pago
   };
   const auto = { frequency: 1, frequency_type: "months", transaction_amount: await getMonthlyPrice(), currency_id: currency() };
-  try {
-    return await mp<MPPreapproval>("/preapproval", {
-      method: "POST",
-      body: JSON.stringify({ ...base, auto_recurring: { ...auto, billing_day: 1, billing_day_proportional: true } }),
-    });
-  } catch (e) {
-    // Si la cuenta no admite día fijo de cobro, se crea con cobro mensual desde hoy.
-    console.warn("[mp] preapproval con billing_day rechazado, reintento sin él:", e);
-    return mp<MPPreapproval>("/preapproval", { method: "POST", body: JSON.stringify({ ...base, auto_recurring: auto }) });
-  }
+  return mp<MPPreapproval>("/preapproval", { method: "POST", body: JSON.stringify({ ...base, auto_recurring: auto }) });
 }
 
 export const getPreapproval = (id: string) => mp<MPPreapproval>(`/preapproval/${encodeURIComponent(id)}`);

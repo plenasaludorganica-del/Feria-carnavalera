@@ -103,7 +103,7 @@ export async function markSold(form: FormData) {
   redirect("/panel?vendido=1");
 }
 
-/** Da de baja el débito automático. La cuota ya pagada sigue vigente hasta fin de mes. */
+/** Da de baja el débito automático. La cuota ya pagada sigue vigente hasta su vencimiento. */
 export async function cancelAutoDebit() {
   const { profile } = await requireUser("/panel");
   if (!profile.mp_preapproval_id) return;

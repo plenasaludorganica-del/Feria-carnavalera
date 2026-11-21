@@ -4,7 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import { formatDate, formatPrice } from "@/lib/config";
 import { getMonthlyPrice } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
-import { endOfMonthISO, todayISO } from "@/lib/subscription";
+import { addMonthISO, daysLeft, todayISO } from "@/lib/subscription";
 
 export const metadata: Metadata = { title: "Cuota mensual" };
 
@@ -19,8 +19,8 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
   const today = todayISO();
   const startsNextMonth = state === "activo" && profile.paid_until;
   const covers = startsNextMonth
-    ? endOfMonthISO(new Date(Date.parse(profile.paid_until! + "T12:00:00Z") + 86_400_000).toISOString().slice(0, 10))
-    : endOfMonthISO(today);
+    ? addMonthISO(profile.paid_until!)
+    : addMonthISO(today);
 
   const title = {
     activo: profile.mp_preapproval_status === "authorized" ? "Tu cuota está al día" : "Activá el débito automático",
@@ -30,9 +30,9 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
   }[state];
 
   const body = {
-    activo: `Tu cuota está paga hasta el ${formatDate(profile.paid_until)}. Si pagás ahora, quedás cubierto hasta el ${formatDate(covers)}.`,
-    vencido: `Venció el ${formatDate(profile.paid_until)}. Tus publicaciones están guardadas pero no se ven en el catálogo. Cuando pagues, vuelven a aparecer tal como estaban.`,
-    sin_pago: `Con el pago activás tu panel de vendedor. Te cubre hasta el ${formatDate(covers)}; la cuota vence el último día de cada mes y se renueva sola el día 1.`,
+    activo: `Tu cuota vence el ${formatDate(profile.paid_until)}${daysLeft(profile.paid_until) <= 7 ? ` (en ${daysLeft(profile.paid_until)} días)` : ""}. Si renovás ahora no perdés días: quedás cubierto hasta el ${formatDate(covers)}.`,
+    vencido: `Venció el ${formatDate(profile.paid_until)}. No se borró nada: tus publicaciones están guardadas, pero no se ven en la feria y tu panel queda cerrado hasta que renueves. Cuando pagues, vuelve todo tal como estaba.`,
+    sin_pago: `Con el pago se publica tu puesto. Te cubre hasta el ${formatDate(covers)} y después se renueva todos los meses ese mismo día.`,
     suspendido: "Un administrador suspendió tu cuenta. Tus publicaciones están guardadas pero ocultas. Escribinos para resolverlo.",
   }[state];
 
@@ -50,7 +50,7 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
             {state !== "suspendido" && profile.mp_preapproval_status === "authorized" && (
               <div className="status" data-tone="ok" style={{ textAlign: "left", marginTop: 16 }}>
                 <strong>Débito automático activo</strong>
-                <span>Mercado Pago cobra {formatPrice(price, currency)} el día 1 de cada mes. No tenés que hacer nada.</span>
+                <span>Mercado Pago cobra {formatPrice(price, currency)} todos los meses el día {Number((profile.paid_until ?? today).slice(8, 10))}. Próximo cobro: {formatDate(profile.paid_until)}. No tenés que hacer nada.</span>
               </div>
             )}
 
@@ -58,7 +58,7 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
               <>
                 <p className="pay-amount">{formatPrice(price, currency)} <small>por mes</small></p>
                 <ul className="pay-list">
-                  <li>Se cobra solo el día 1 de cada mes con tu tarjeta, por Mercado Pago.</li>
+                  <li>Se cobra hoy y después solo, todos los meses el día {Number(today.slice(8, 10))}, con tu tarjeta por Mercado Pago.</li>
                   <li>El primer cobro es proporcional a los días que quedan de este mes.</li>
                   <li>Publicaciones ilimitadas con hasta 8 fotos cada una. Te escriben directo a tu WhatsApp.</li>
                   <li>Podés darlo de baja cuando quieras desde tu panel. Tus productos se ocultan, no se borran.</li>

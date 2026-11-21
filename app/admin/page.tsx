@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import { formatDate } from "@/lib/config";
 import { requireUser } from "@/lib/session";
-import { STATE_COPY, todayISO } from "@/lib/subscription";
+import { STATE_COPY, addMonthISO, todayISO } from "@/lib/subscription";
 import type { AdminSeller, SubscriptionState } from "@/lib/types";
 import { setPaidUntil, toggleSuspend } from "./actions";
 import TempPassword from "./TempPassword";
@@ -30,7 +30,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       (!q || [s.display_name, s.email, s.whatsapp, s.city].some((v) => v?.toLowerCase().includes(q))),
   );
   const count = (st: SubscriptionState) => all.filter((s) => s.state === st).length;
-  const thisMonth = todayISO().slice(0, 7);
+  const inAMonth = addMonthISO(todayISO());
 
   return (
     <>
@@ -83,7 +83,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                       <form action={setPaidUntil}>
                         <input type="hidden" name="id" value={s.id} />
                         <label className="sr-only" htmlFor={`m-${s.id}`}>Pago hasta</label>
-                        <input id={`m-${s.id}`} type="month" name="month" defaultValue={thisMonth} className="input" style={{ minHeight: 36, padding: "4px 8px", width: 150 }} />
+                        <input id={`m-${s.id}`} type="date" name="until" defaultValue={inAMonth} className="input" style={{ minHeight: 36, padding: "4px 8px", width: 160 }} />
                         <button className="btn btn-ghost btn-sm">Marcar pago</button>
                       </form>
                     </td>

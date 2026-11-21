@@ -12,12 +12,12 @@ export async function toggleSuspend(form: FormData) {
   revalidatePath("/admin");
 }
 
-/** Cobro manual (efectivo o transferencia): deja paga la cuota hasta fin del mes elegido. */
+/** Cobro manual (efectivo o transferencia): deja paga la cuota hasta la fecha elegida. */
 export async function setPaidUntil(form: FormData) {
   const { supabase } = await requireUser("/admin");
-  const month = String(form.get("month") ?? ""); // YYYY-MM
-  if (!/^\d{4}-\d{2}$/.test(month)) return;
-  await supabase.rpc("admin_set_paid_until", { uid: String(form.get("id")), until: `${month}-01`, note: "cobro manual" });
+  const until = String(form.get("until") ?? ""); // YYYY-MM-DD
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(until)) return;
+  await supabase.rpc("admin_set_paid_until", { uid: String(form.get("id")), until, note: "cobro manual" });
   revalidatePath("/admin");
 }
 

@@ -95,7 +95,7 @@ export default async function Home() {
               </li>
               <li data-fx="rise">
                 <h3>Publicalo y recibí mensajes</h3>
-                <p>Cuando te guste, activás la cuota mensual y los compradores te escriben a tu WhatsApp.</p>
+                <p>Cuando te guste, activás la cuota mensual (se renueva cada mes el mismo día) y te escriben a tu WhatsApp.</p>
               </li>
             </ol>
           </section>

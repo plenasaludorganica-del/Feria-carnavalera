@@ -23,18 +23,20 @@ Navegador ──► Next.js 15 (App Router, en Cloudflare Workers vía OpenNext)
 | Mercado Pago | Preferencia de pago, lectura del pago, firma del webhook | `lib/mercadopago.ts`, `app/api/mp/*` |
 | Diseño | Tokens, portada con capas, tarjetas blancas | `app/globals.css`, `components/*` |
 
-### Regla de vencimiento (último día de cada mes)
+### Regla de vencimiento (cada mes, el mismo día en que pagó)
 
-Cada perfil tiene `paid_until`, el último día del mes ya pagado. **El estado se calcula, no se guarda.**
-Un vendedor está activo cuando cumple `not suspended and paid_until >= hoy`.
+Cada perfil tiene `paid_until`, la **fecha de vencimiento** de la cuota; ese día todavía está activo. **El estado se calcula, no se guarda.**
 
-- El 1° del mes, quien no pagó deja de cumplir la condición. Sus productos desaparecen del catálogo sin que corra ningún proceso, y **no se borran**.
-- Al entrar a `/panel` con la cuota vencida, se lo manda a `/suscripcion`, que muestra el aviso y el botón para pagar.
-- Cuando Mercado Pago confirma el pago, `register_payment()` calcula el nuevo `paid_until`:
-  - si estaba al día, suma el mes siguiente;
-  - si estaba vencido o es nuevo, cubre hasta el fin del mes actual.
-  
-  Los productos vuelven a verse tal como estaban.
+- **Ejemplo**: si paga el 21/11, vence el 21/12; después el 21/01, y así cada mes.
+- **Si renueva antes** de vencer, se suma un mes desde el vencimiento: no pierde días.
+- **Si paga tarde**, el mes nuevo arranca desde el día en que pagó, y ese pasa a ser su día fijo.
+- **Una semana antes** del vencimiento, el panel muestra un cartel para renovar. Con débito automático, el cartel solo avisa que se renueva solo.
+- **Si vence sin pagar**:
+  - no se borra nada;
+  - sus publicaciones dejan de verse;
+  - no puede entrar al panel y ve el aviso con el botón para pagar.
+- **Cuando paga**, vuelve todo tal cual estaba.
+- **Quien todavía no pagó nunca** sí entra al panel, para armar su puesto y verlo antes de pagar.
 - `register_payment()` es idempotente: si Mercado Pago avisa dos veces, el pago se cuenta una sola vez.
 
 La zona horaria del negocio está en `app_today()` (SQL) y en `todayISO()` (`lib/subscription.ts`).
@@ -73,9 +75,9 @@ En **Admin → Pagos y precio** se cargan el token de Mercado Pago y la clave de
 La Feria también **consulta a Mercado Pago** cuando el vendedor vuelve del pago y cuando entra a su panel. Por eso las cuentas se activan aunque el webhook no esté configurado; con el webhook, las renovaciones se acreditan al instante.
 
 ### Débito automático
-- El botón principal crea una suscripción de Mercado Pago (`/preapproval`) con cobro el **día 1 de cada mes**. El primer cobro es proporcional a los días que quedan del mes.
-- Cada cobro llega al webhook como "Pagos recurrentes" y extiende `paid_until` hasta el fin de mes.
-- Con el débito activo hay **3 días de gracia** después del vencimiento. Mercado Pago puede tardar o reintentar el cobro del día 1, y así el vendedor no desaparece del catálogo por unas horas. Sin débito, la gracia es 0.
+- El botón principal crea una suscripción de Mercado Pago (`/preapproval`). Cobra el día que el vendedor se suscribe y después todos los meses ese mismo día.
+- Cada cobro llega como "Pagos recurrentes" y extiende `paid_until` un mes.
+- Con el débito activo hay **3 días de gracia**, porque Mercado Pago puede tardar o reintentar el cobro. Sin débito, la gracia es 0.
 - El vendedor puede darlo de baja desde su panel. También existe la opción "pagar solo este mes" (Checkout Pro).
 - Para cambiar el precio a quienes ya están suscriptos: `updatePreapprovalAmount()` en `lib/mercadopago.ts`.
 4. Definí la cuota en `MP_MONTHLY_PRICE`.

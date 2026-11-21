@@ -35,6 +35,24 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
 
       {sp.clave && <p className="form-ok paper" role="status" style={{ marginBottom: 16 }}>Listo, tu contraseña nueva quedó guardada.</p>}
 
+      {live && left <= 7 && (
+        <div className={`renew-banner${profile.mp_preapproval_status === "authorized" ? " is-auto" : ""}`} role="status" data-fx="rise">
+          <div>
+            <strong>
+              {left === 0 ? "Tu cuota vence hoy" : `Tu cuota vence en ${left} ${left === 1 ? "día" : "días"}`} · {formatDate(profile.paid_until)}
+            </strong>
+            <span>
+              {profile.mp_preapproval_status === "authorized"
+                ? "Tenés débito automático: se renueva sola ese día. No tenés que hacer nada."
+                : "Renovala para que tu puesto siga visible y no se cierre tu panel. Si renovás antes, no perdés días."}
+            </span>
+          </div>
+          {profile.mp_preapproval_status !== "authorized" && (
+            <Link href="/suscripcion" className="btn btn-oro">Renovar ahora</Link>
+          )}
+        </div>
+      )}
+
       {!live && (
         <section className="paper setup" aria-labelledby="armar" data-fx="rise">
           <div className="setup-head">
@@ -89,7 +107,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
               {profile.mp_preapproval_status === "authorized" ? (
                 <>
                   <p className="sub" style={{ margin: "0 0 12px" }}>
-                    Débito automático activo: Mercado Pago renueva tu cuota sola el día 1 de cada mes.
+                    Débito automático activo: Mercado Pago renueva tu cuota sola todos los meses el día {Number((profile.paid_until ?? "").slice(8, 10)) || "—"}.
                   </p>
                   <form action={cancelAutoDebit}>
                     <button className="btn btn-ghost btn-sm" style={{ width: "100%" }}>Dar de baja el débito automático</button>
@@ -98,7 +116,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
               ) : (
                 <>
                   <p className="sub" style={{ margin: "0 0 12px" }}>
-                    Sin débito automático: la cuota vence el último día del mes. Si no la renovás, tus publicaciones se ocultan, pero no se borran.
+                    Sin débito automático: tenés que renovar antes del vencimiento. Si no, tu panel se cierra y tus publicaciones se ocultan (no se borra nada).
                   </p>
                   <Link href="/suscripcion" className="btn btn-oro" style={{ width: "100%" }}>Activar débito automático</Link>
                 </>

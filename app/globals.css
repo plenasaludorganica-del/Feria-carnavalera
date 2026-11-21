@@ -661,3 +661,14 @@ table.admin td form { display: inline-flex; gap: 6px; align-items: center; }
 /* Admin: etiquetas de estado en una sola línea */
 table.admin .badge { white-space: nowrap; }
 table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
+
+/* Cartel de renovación (una semana antes del vencimiento) */
+.renew-banner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
+  margin-bottom: 20px; padding: 16px 20px; border-radius: 16px;
+  background: linear-gradient(100deg, #fff3dc, #ffe1ef); color: #5a2a00;
+  box-shadow: 0 0 0 2px var(--oro), 0 20px 40px -24px #000;
+}
+.renew-banner div { display: grid; gap: 2px; }
+.renew-banner strong { font-size: 1.1rem; color: var(--tinta); }
+.renew-banner.is-auto { background: #e6f6ee; color: #0d5c3d; box-shadow: 0 0 0 2px #9fd9bd; }

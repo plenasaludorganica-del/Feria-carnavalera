@@ -25,7 +25,12 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const { state, profile } = await requireUser("/panel");
   // Si no está al día pero tiene débito automático, consulta a Mercado Pago por si ya pagó.
   if (state !== "activo" && profile.mp_preapproval_id) await syncUserBilling(profile.id);
-  if (state === "suspendido") redirect("/suscripcion");
+  // Vencido o suspendido: no entra al panel; ve el aviso para renovar.
+  // (Quien todavía no pagó nunca sí entra, para armar su puesto antes de pagar.)
+  if (state !== "activo") {
+    const fresh = await requireUser("/panel");
+    if (fresh.state === "vencido" || fresh.state === "suspendido") redirect("/suscripcion");
+  }
   return (
     <>
       <SiteHeader />

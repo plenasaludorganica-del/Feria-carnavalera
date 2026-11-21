@@ -5,6 +5,15 @@ export function todayISO(tz = "America/Argentina/Buenos_Aires") {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date());
 }
 
+/** Suma un mes manteniendo el día (31/01 → 28/02, igual que Postgres). */
+export function addMonthISO(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const ny = m === 12 ? y + 1 : y;
+  const nm = m === 12 ? 1 : m + 1;
+  const last = new Date(Date.UTC(ny, nm, 0)).getUTCDate();
+  return `${ny}-${String(nm).padStart(2, "0")}-${String(Math.min(d, last)).padStart(2, "0")}`;
+}
+
 export function endOfMonthISO(iso: string) {
   const [y, m] = iso.split("-").map(Number);
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
