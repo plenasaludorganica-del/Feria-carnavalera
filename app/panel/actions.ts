@@ -78,7 +78,8 @@ export async function deleteProduct(form: FormData) {
   await supabase.from("products").delete().eq("id", id).eq("seller_id", user.id);
   const paths = (data?.images ?? [])
     .map((u: string) => u.split("/product-images/")[1])
-    .filter((p: string | undefined): p is string => Boolean(p?.startsWith(user.id + "/")));
+    .filter((p: string | undefined): p is string => Boolean(p?.startsWith(user.id + "/")))
+    .flatMap((p: string) => [p, p.replace(/\.webp$/, "_t.webp")]);
   if (paths.length) await supabase.storage.from("product-images").remove(paths);
   revalidatePath("/panel");
   revalidatePath("/");

@@ -7,12 +7,12 @@ import { endOfMonthISO, todayISO } from "@/lib/subscription";
 
 export const metadata: Metadata = { title: "Cuota mensual" };
 
-const price = Number(process.env.MP_MONTHLY_PRICE ?? 5000);
-const currency = process.env.MP_CURRENCY ?? "ARS";
-
 export default async function Suscripcion({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const { profile, state } = await requireUser("/suscripcion");
+  // Se leen en cada request (en Cloudflare las variables llegan con la petición).
+  const price = Number(process.env.MP_MONTHLY_PRICE ?? 5000);
+  const currency = process.env.MP_CURRENCY ?? "ARS";
 
   // Hasta qué fecha cubriría este pago (misma regla que register_payment en SQL)
   const today = todayISO();

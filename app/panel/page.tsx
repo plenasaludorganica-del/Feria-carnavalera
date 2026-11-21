@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categoryLabel, formatDate, formatPrice } from "@/lib/config";
+import { categoryLabel, formatDate, formatPrice, thumbUrl } from "@/lib/config";
 import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
 import type { OwnProduct } from "@/lib/types";
@@ -82,7 +82,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                   <li key={p.id} className="myitem" data-paused={paused}>
                     {p.images[0]
                       // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={p.images[0]} alt="" loading="lazy" />
+                      ? <img src={thumbUrl(p.images[0])} alt="" loading="lazy" />
                       : <div className="ph" />}
                     <div>
                       <h3>{p.title}</h3>

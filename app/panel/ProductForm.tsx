@@ -1,16 +1,16 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
-import { CATEGORIES, CONDITIONS } from "@/lib/config";
+import { CATEGORIES, CONDITIONS, thumbUrl } from "@/lib/config";
 import { createClient } from "@/lib/supabase/client";
 import type { OwnProduct } from "@/lib/types";
 import { saveProduct, type FormState } from "./actions";
 
 const MAX_PHOTOS = 8;
 
-/** Achica la foto en el navegador (máx 1600px, WebP) antes de subirla: menos datos, carga más rápida. */
-async function compress(file: File): Promise<Blob> {
+/** Achica la foto en el navegador (WebP) antes de subirla: menos datos, carga más rápida. */
+async function compress(file: File, max: number): Promise<Blob> {
   const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
   const canvas = document.createElement("canvas");
   canvas.width = w; canvas.height = h;
@@ -34,10 +34,13 @@ export default function ProductForm({ userId, product }: { userId: string; produ
     setUploading(list.length);
     for (const f of list) {
       try {
-        const blob = await compress(f);
-        const path = `${userId}/${crypto.randomUUID()}.webp`;
-        const { error } = await supabase.storage.from("product-images").upload(path, blob, { contentType: "image/webp", cacheControl: "31536000" });
+        const [full, thumb] = await Promise.all([compress(f, 1600), compress(f, 480)]);
+        const id = crypto.randomUUID();
+        const path = `${userId}/${id}.webp`;
+        const opts = { contentType: "image/webp", cacheControl: "31536000" };
+        const { error } = await supabase.storage.from("product-images").upload(path, full, opts);
         if (error) throw error;
+        await supabase.storage.from("product-images").upload(`${userId}/${id}_t.webp`, thumb, opts);
         const { data } = supabase.storage.from("product-images").getPublicUrl(path);
         setImages((prev) => [...prev, data.publicUrl]);
       } catch {
@@ -63,7 +66,7 @@ export default function ProductForm({ userId, product }: { userId: string; produ
           {images.map((src, i) => (
             <div className="photo" key={src}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`Foto ${i + 1}${i === 0 ? " (portada)" : ""}`} />
+              <img src={thumbUrl(src)} alt={`Foto ${i + 1}${i === 0 ? " (portada)" : ""}`} />
               <button type="button" aria-label={`Quitar foto ${i + 1}`} onClick={() => setImages((p) => p.filter((x) => x !== src))}>×</button>
             </div>
           ))}

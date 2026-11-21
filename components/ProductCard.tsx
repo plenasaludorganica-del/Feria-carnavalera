@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categoryLabel, formatPrice } from "@/lib/config";
+import { categoryLabel, formatPrice, thumbUrl } from "@/lib/config";
 import type { CatalogItem } from "@/lib/types";
 import { IconBrillo } from "./icons";
 
@@ -10,7 +10,7 @@ export default function ProductCard({ item, priority = false }: { item: CatalogI
       <div className="tag-photo">
         {item.cover ? (
           <Image
-            src={item.cover}
+            src={thumbUrl(item.cover)}
             alt=""
             fill
             sizes="(max-width: 520px) 50vw, (max-width: 1000px) 33vw, 240px"

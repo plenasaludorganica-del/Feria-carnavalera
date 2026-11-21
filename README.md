@@ -6,7 +6,7 @@ Los vendedores pagan una cuota mensual por Mercado Pago y los compradores los co
 ## Arquitectura
 
 ```
-Navegador ──► Next.js 15 (App Router, en Vercel)
+Navegador ──► Next.js 15 (App Router, en Cloudflare Workers vía OpenNext)
                ├─ Páginas públicas (catálogo, producto) ──► Supabase RPC search_catalog / get_catalog_product
                ├─ /ingresar ───────────────────────────────► Supabase Auth (email + contraseña)
                ├─ /suscripcion ─► /api/mp/checkout ────────► Mercado Pago Checkout Pro
@@ -55,7 +55,7 @@ Está configurada para Argentina (Buenos Aires).
    ```
 
 ### 2. Variables de entorno
-Copiá `.env.example` a `.env.local` y completalo. En Vercel, cargá las mismas variables en Project Settings → Environment Variables.
+Copiá `.env.example` a `.env.local` y completalo. En Cloudflare se cargan como se explica en "Publicar en Cloudflare".
 
 ### 3. Mercado Pago
 1. En [Tus integraciones](https://www.mercadopago.com.ar/developers/panel/app), creá una aplicación de tipo **Checkout Pro**.
@@ -78,6 +78,32 @@ npm install
 npm run dev
 ```
 Sin las claves de Supabase el sitio muestra **productos de muestra** (`lib/demo.ts`), para revisar el diseño.
+
+## Publicar en Cloudflare
+
+El sitio corre en **Cloudflare Workers** con el adaptador OpenNext (`wrangler.jsonc`, `open-next.config.ts`).
+
+1. En Cloudflare, entrá a **Workers & Pages → Create → Import a repository** y elegí `feria-carnavalera`.
+2. Configurá el build:
+   - **Build command**: `npx opennextjs-cloudflare build`
+   - **Deploy command**: `npx opennextjs-cloudflare deploy`
+3. Cargá las **variables de build** (Build → Variables). Las `NEXT_PUBLIC_*` se incrustan al compilar:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SITE_URL`
+   - `NEXT_PUBLIC_BRAND_WORDMARK`
+4. Cargá las **variables y secretos de ejecución** (Settings → Variables and Secrets):
+   - como *Secret*: `SUPABASE_SERVICE_ROLE_KEY`, `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`;
+   - como texto: `MP_MONTHLY_PRICE`, `MP_CURRENCY`.
+5. Cada push a la rama principal se publica solo.
+
+Para probar en local, como lo ejecuta Cloudflare: `npm run preview`.
+
+**Planes de Cloudflare:**
+- El gratis alcanza para probar: 100.000 visitas por día, con un límite de CPU por visita.
+- Para producción conviene **Workers Paid (US$ 5/mes)**. Saca ese límite y evita cortes en páginas pesadas.
+
+**Fotos:** cada foto se sube en dos tamaños, 1600 px y una miniatura de 480 px (`_t.webp`). El catálogo usa las miniaturas, así que no hace falta el optimizador de imágenes pago.
 
 ## Piezas de Higgsfield
 
