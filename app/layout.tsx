@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Bagel_Fat_One, Bricolage_Grotesque } from "next/font/google";
 import FeedbackButton from "@/components/FeedbackButton";
 import ScrollFX from "@/components/ScrollFX";
-import { getSupportWhatsapp } from "@/lib/support";
 import SmoothScroll from "@/components/SmoothScroll";
 import "lenis/dist/lenis.css";
 import "./globals.css";
@@ -28,8 +27,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#1c0716" };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const support = await getSupportWhatsapp().catch(() => undefined);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${bricolage.variable} ${bagel.variable}`} suppressHydrationWarning>
       <head>
@@ -46,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {children}
         <ScrollFX />
         <SmoothScroll />
-        <FeedbackButton supportWhatsapp={support} />
+        <FeedbackButton />
       </body>
     </html>
   );

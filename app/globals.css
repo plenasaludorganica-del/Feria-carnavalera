@@ -1025,3 +1025,6 @@ html, body { overflow-x: clip; }
 .fb-sep { display: flex; align-items: center; gap: 10px; color: var(--tinta-suave); font-size: .85rem; }
 .fb-sep::before, .fb-sep::after { content: ""; flex: 1; height: 1px; background: var(--linea); }
 .linklike { border: 0; background: none; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.fb-kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f3eefa; padding: 4px; border-radius: 12px; }
+.fb-kinds button { border: 0; border-radius: 9px; padding: .65rem .5rem; background: transparent; font-weight: 700; color: var(--tinta-suave); cursor: pointer; }
+.fb-kinds button[aria-checked="true"] { background: #fff; color: var(--tinta); box-shadow: 0 0 0 2px var(--neon), 0 0 14px #e0115f55; }

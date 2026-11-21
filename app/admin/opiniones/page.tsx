@@ -8,7 +8,7 @@ import { toggleRead } from "./actions";
 export const metadata: Metadata = { title: "Opiniones" };
 export const dynamic = "force-dynamic";
 
-interface Feedback { id: number; created_at: string; rating: number | null; message: string | null; page: string | null; read: boolean }
+interface Feedback { id: number; created_at: string; rating: number | null; message: string | null; page: string | null; read: boolean; kind: "opinion" | "problema"; contact: string | null }
 
 export default async function Opiniones() {
   const { profile, supabase } = await requireUser("/admin/opiniones");
@@ -18,6 +18,7 @@ export default async function Opiniones() {
   const rated = rows.filter((r) => r.rating);
   const avg = rated.length ? rated.reduce((n, r) => n + (r.rating ?? 0), 0) / rated.length : 0;
   const unread = rows.filter((r) => !r.read).length;
+  const problems = rows.filter((r) => r.kind === "problema" && !r.read).length;
   const fmt = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Buenos_Aires" });
 
   return (
@@ -26,9 +27,9 @@ export default async function Opiniones() {
       <main className="page">
         <div className="wrap" style={{ paddingBottom: 64, maxWidth: 820 }}>
           <p style={{ margin: "0 0 8px" }}><Link href="/admin">← Vendedores</Link></p>
-          <h1 className="page-title" style={{ marginBottom: 16 }}>Opiniones</h1>
+          <h1 className="page-title" style={{ marginBottom: 16 }}>Mensajes y opiniones</h1>
           <div className="stats" style={{ gridTemplateColumns: "repeat(3, minmax(0,1fr))" }}>
-            <div><b>{rows.length}</b>Recibidas</div>
+            <div><b>{problems}</b>Problemas sin leer</div>
             <div><b>{unread}</b>Sin leer</div>
             <div><b>{avg ? avg.toFixed(1) : "—"}</b>Puntaje promedio</div>
           </div>
@@ -39,12 +40,21 @@ export default async function Opiniones() {
               {rows.map((r) => (
                 <li key={r.id} className="paper fb-item" data-read={r.read}>
                   <div className="fb-item-head">
-                    <span className="fb-item-stars" aria-label={r.rating ? `${r.rating} de 5` : "Sin puntaje"}>
-                      {r.rating ? "★".repeat(r.rating) + "☆".repeat(5 - r.rating) : "Sin puntaje"}
-                    </span>
+                    {r.kind === "problema" ? (
+                      <span className="badge badge-bad">Problema</span>
+                    ) : (
+                      <span className="fb-item-stars" aria-label={r.rating ? `${r.rating} de 5` : "Sin puntaje"}>
+                        {r.rating ? "★".repeat(r.rating) + "☆".repeat(5 - r.rating) : "Opinión sin puntaje"}
+                      </span>
+                    )}
                     <small>{fmt.format(new Date(r.created_at))}{r.page ? ` · desde ${r.page}` : ""}</small>
                   </div>
                   {r.message && <p style={{ margin: "8px 0 0", whiteSpace: "pre-line" }}>{r.message}</p>}
+                  {r.contact && (
+                    <p style={{ margin: "8px 0 0" }}>
+                      Responder a: <a href={`mailto:${r.contact}`} style={{ color: "var(--neon)", fontWeight: 700 }}>{r.contact}</a>
+                    </p>
+                  )}
                   <form action={toggleRead} style={{ marginTop: 10 }}>
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="read" value={String(!r.read)} />

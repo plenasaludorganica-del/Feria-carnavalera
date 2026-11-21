@@ -40,7 +40,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           <div className="section-head" style={{ marginBottom: 20 }}>
             <h1 className="page-title" style={{ margin: 0 }}>Vendedores</h1>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Link href="/admin/opiniones" className="btn btn-fucsia">Opiniones</Link>
+              <Link href="/admin/opiniones" className="btn btn-fucsia">Mensajes y opiniones</Link>
               <Link href="/admin/pagos" className="btn btn-oro">Pagos y precio</Link>
             </div>
           </div>

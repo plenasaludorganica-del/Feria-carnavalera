@@ -2,9 +2,15 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { sendFeedback, type FeedbackState } from "@/app/feedback-actions";
 
-/** Botón al costado + ventanita para dejar una opinión anónima con estrellas. */
-export default function FeedbackButton({ supportWhatsapp }: { supportWhatsapp?: string }) {
+type Kind = "problema" | "opinion";
+
+/**
+ * Botón "Ayuda" en todas las páginas. Todo lo que se manda llega solo al
+ * panel de administración (Admin → Opiniones). No se usa WhatsApp.
+ */
+export default function FeedbackButton() {
   const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState<Kind>("opinion");
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [state, action, pending] = useActionState<FeedbackState, FormData>(sendFeedback, {});
@@ -19,7 +25,6 @@ export default function FeedbackButton({ supportWhatsapp }: { supportWhatsapp?: 
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, []);
-
   useEffect(() => {
     const d = dialogRef.current;
     if (!d) return;
@@ -42,53 +47,57 @@ export default function FeedbackButton({ supportWhatsapp }: { supportWhatsapp?: 
         {state.ok ? (
           <div className="fb-body">
             <h2>¡Gracias!</h2>
-            <p>Tu opinión nos llegó. La leemos para mejorar la feria.</p>
+            <p>{kind === "problema" ? "Recibimos tu mensaje. Si dejaste un contacto, te respondemos." : "Tu opinión nos llegó. La leemos para mejorar la feria."}</p>
             <button type="button" className="btn btn-fucsia" onClick={() => setOpen(false)}>Cerrar</button>
           </div>
         ) : (
           <form action={action} className="fb-body">
             <button type="button" className="fb-close" aria-label="Cerrar" onClick={() => setOpen(false)}>×</button>
             <h2>¿En qué te ayudamos?</h2>
-            {supportWhatsapp && (
-              <a
-                className="btn btn-whatsapp fb-support"
-                href={`https://wa.me/${supportWhatsapp}?text=${encodeURIComponent("Hola, tengo una consulta sobre la Feria del Comparsero.")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Tengo un problema: escribir por WhatsApp
-              </a>
-            )}
-            <div className="fb-sep"><span>o dejanos tu opinión para mejorar</span></div>
-            <p className="fb-sub">Es anónimo: no guardamos quién lo manda y no se publica.</p>
 
-            <fieldset className="fb-stars" onMouseLeave={() => setHover(0)}>
-              <legend>¿Qué te parece la página?</legend>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  aria-label={`${n} ${n === 1 ? "estrella" : "estrellas"}`}
-                  aria-pressed={rating === n}
-                  className={n <= shown ? "on" : ""}
-                  onMouseEnter={() => setHover(n)}
-                  onClick={() => setRating(n)}
-                >★</button>
-              ))}
-              <span className="fb-label">{labels[shown]}</span>
-            </fieldset>
-            <input type="hidden" name="rating" value={rating || ""} />
+            <div className="fb-kinds" role="radiogroup" aria-label="Tipo de mensaje">
+              <button type="button" role="radio" aria-checked={kind === "problema"} onClick={() => setKind("problema")}>Tengo un problema</button>
+              <button type="button" role="radio" aria-checked={kind === "opinion"} onClick={() => setKind("opinion")}>Quiero dejar una opinión</button>
+            </div>
+            <input type="hidden" name="kind" value={kind} />
             <input type="hidden" name="page" value={page} />
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="sr-only" aria-hidden="true" />
 
-            <div className="field">
-              <label htmlFor="fb-msg">¿Qué te gustaría encontrar o qué le falta?</label>
-              <textarea id="fb-msg" name="message" className="textarea" maxLength={1500}
-                placeholder="Ej.: filtrar por talle, ver vendedores de mi ciudad, una página como tal otra…" />
-            </div>
+            {kind === "opinion" ? (
+              <>
+                <p className="fb-sub">Es anónimo: no guardamos quién lo manda y no se publica.</p>
+                <fieldset className="fb-stars" onMouseLeave={() => setHover(0)}>
+                  <legend>¿Qué te parece la página?</legend>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button key={n} type="button" aria-label={`${n} ${n === 1 ? "estrella" : "estrellas"}`} aria-pressed={rating === n}
+                      className={n <= shown ? "on" : ""} onMouseEnter={() => setHover(n)} onClick={() => setRating(n)}>★</button>
+                  ))}
+                  <span className="fb-label">{labels[shown]}</span>
+                </fieldset>
+                <input type="hidden" name="rating" value={rating || ""} />
+                <div className="field">
+                  <label htmlFor="fb-msg">¿Qué te gustaría encontrar o qué le falta?</label>
+                  <textarea id="fb-msg" name="message" className="textarea" maxLength={1500}
+                    placeholder="Ej.: filtrar por talle, ver vendedores de mi ciudad…" />
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="fb-sub">Llega solo a la administración de la feria.</p>
+                <div className="field">
+                  <label htmlFor="fb-msg">¿Qué pasó?</label>
+                  <textarea id="fb-msg" name="message" className="textarea" maxLength={1500} required
+                    placeholder="Ej.: no puedo subir fotos, no me llegó el email, el pago no se acreditó…" />
+                </div>
+                <div className="field">
+                  <label htmlFor="fb-contact">Tu email para responderte (opcional)</label>
+                  <input id="fb-contact" name="contact" type="email" className="input" maxLength={120} autoComplete="email" />
+                </div>
+              </>
+            )}
             {state.error && <p className="form-error" role="alert">{state.error}</p>}
             <button className="btn btn-fucsia" style={{ width: "100%" }} disabled={pending}>
-              {pending ? "Enviando…" : "Enviar opinión"}
+              {pending ? "Enviando…" : kind === "problema" ? "Enviar mensaje" : "Enviar opinión"}
             </button>
           </form>
         )}
