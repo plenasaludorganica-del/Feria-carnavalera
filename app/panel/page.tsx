@@ -39,7 +39,12 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
         <div className={`renew-banner${profile.mp_preapproval_status === "authorized" ? " is-auto" : ""}`} role="status" data-fx="rise">
           <div>
             <strong>
-              {left === 0 ? "Tu cuota vence hoy" : `Tu cuota vence en ${left} ${left === 1 ? "día" : "días"}`} · {formatDate(profile.paid_until)}
+              {left < 0
+                ? "Estamos procesando el cobro de tu débito automático"
+                : left === 0
+                  ? "Tu cuota vence hoy"
+                  : `Tu cuota vence en ${left} ${left === 1 ? "día" : "días"}`}{" "}
+              · {formatDate(profile.paid_until)}
             </strong>
             <span>
               {profile.mp_preapproval_status === "authorized"
