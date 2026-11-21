@@ -6,5 +6,11 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "feria-carnavalera" }],
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Dominio propio: Cloudflare lo conecta solo al publicar
+  "routes": [
+    { "pattern": "feriadelcomparsero.com", "custom_domain": true },
+    { "pattern": "www.feriadelcomparsero.com", "custom_domain": true }
+  ],
+  "workers_dev": true
 }
