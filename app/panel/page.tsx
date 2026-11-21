@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ConfirmButton from "@/components/ConfirmButton";
+import ShareCard from "@/components/ShareCard";
 import { categoryLabel, formatDate, formatPrice, thumbUrl } from "@/lib/config";
 import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
@@ -219,6 +220,9 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             </ul>
           )}
         </section>
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <ShareCard />
       </div>
     </div>
   );

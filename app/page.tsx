@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import SearchBar from "@/components/SearchBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import ShareCard from "@/components/ShareCard";
 import SparkleRain from "@/components/SparkleRain";
 import { searchCatalog } from "@/lib/catalog";
 
@@ -98,6 +99,10 @@ export default async function Home() {
                 <p>Cuando te guste, activás la cuota mensual (se renueva cada mes el mismo día) y te escriben a tu WhatsApp.</p>
               </li>
             </ol>
+          </section>
+
+          <section className="section">
+            <ShareCard />
           </section>
 
           <section className="section">

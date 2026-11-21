@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import { formatDate, formatPrice } from "@/lib/config";
+import ShareCard from "@/components/ShareCard";
 import { getMonthlyPrice } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 import { addMonthISO, daysLeft, todayISO } from "@/lib/subscription";
@@ -80,9 +81,20 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
                 </form>
               </>
             )}
+            <aside className="fee-note" aria-label="Para qué es la cuota">
+              <strong>¿Para qué es la cuota?</strong>
+              <p>
+                Mantiene la Feria funcionando: el servidor donde vive la página, el espacio para las fotos de todos los
+                puestos y las mejoras que vamos sumando. No cobramos comisión por tus ventas: lo que vendés es todo tuyo.
+              </p>
+            </aside>
+
             {state === "activo" && (
               <p style={{ marginTop: 16 }}><Link href="/panel" style={{ color: "var(--tinta)" }}>Volver a mi panel</Link></p>
             )}
+          </div>
+          <div className="pay-card" style={{ marginTop: 20 }}>
+            <ShareCard />
           </div>
         </div>
       </main>
