@@ -24,14 +24,14 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
     : addMonthISO(today);
 
   const title = {
-    activo: profile.mp_preapproval_status === "authorized" ? "Tu cuota está al día" : "Activá el débito automático",
+    activo: profile.is_free ? "Tu cuenta está activa" : profile.mp_preapproval_status === "authorized" ? "Tu cuota está al día" : "Activá el débito automático",
     vencido: "Tu cuota venció",
     sin_pago: "Un paso más: pagá la cuota del mes",
     suspendido: "Tu cuenta está suspendida",
   }[state];
 
   const body = {
-    activo: `Tu cuota vence el ${formatDate(profile.paid_until)}${daysLeft(profile.paid_until) <= 7 ? ` (en ${daysLeft(profile.paid_until)} días)` : ""}. Si renovás ahora no perdés días: quedás cubierto hasta el ${formatDate(covers)}.`,
+    activo: profile.is_free ? "Tu puesto está publicado y no tenés que pagar por ahora." : `Tu cuota vence el ${formatDate(profile.paid_until)}${daysLeft(profile.paid_until) <= 7 ? ` (en ${daysLeft(profile.paid_until)} días)` : ""}. Si renovás ahora no perdés días: quedás cubierto hasta el ${formatDate(covers)}.`,
     vencido: `Venció el ${formatDate(profile.paid_until)}. No se borró nada: tus publicaciones están guardadas, pero no se ven en la feria y tu panel queda cerrado hasta que renueves. Cuando pagues, vuelve todo tal como estaba.`,
     sin_pago: `Con el pago se publica tu puesto. Te cubre hasta el ${formatDate(covers)} y después se renueva todos los meses ese mismo día.`,
     suspendido: "Un administrador suspendió tu cuenta. Tus publicaciones están guardadas pero ocultas. Escribinos para resolverlo.",
@@ -48,14 +48,21 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
             {error && <p className="form-error" style={{ marginTop: 12 }}>El pago no se completó. Podés intentar de nuevo con otro medio.</p>}
             <p className="sub" style={{ marginTop: 10 }}>{body}</p>
 
-            {state !== "suspendido" && profile.mp_preapproval_status === "authorized" && (
+            {state === "activo" && profile.is_free && (
+              <div className="status" data-tone="ok" style={{ textAlign: "left", marginTop: 16 }}>
+                <strong>Tenés la cuenta gratis</strong>
+                <span>No tenés que pagar nada hasta el {formatDate(profile.paid_until)}.</span>
+              </div>
+            )}
+
+            {state !== "suspendido" && !(state === "activo" && profile.is_free) && profile.mp_preapproval_status === "authorized" && (
               <div className="status" data-tone="ok" style={{ textAlign: "left", marginTop: 16 }}>
                 <strong>Débito automático activo</strong>
                 <span>Mercado Pago cobra {formatPrice(price, currency)} todos los meses el día {Number((profile.paid_until ?? today).slice(8, 10))}. Próximo cobro: {formatDate(profile.paid_until)}. No tenés que hacer nada.</span>
               </div>
             )}
 
-            {state !== "suspendido" && profile.mp_preapproval_status !== "authorized" && (
+            {state !== "suspendido" && !(state === "activo" && profile.is_free) && profile.mp_preapproval_status !== "authorized" && (
               <>
                 <p className="pay-amount">{formatPrice(price, currency)} <small>por mes</small></p>
                 <ul className="pay-list">

@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/config";
 import { requireUser } from "@/lib/session";
 import { STATE_COPY, addMonthISO, todayISO } from "@/lib/subscription";
 import type { AdminSeller, SubscriptionState } from "@/lib/types";
-import { setPaidUntil, toggleSuspend } from "./actions";
+import { setFree, setPaidUntil, toggleSuspend } from "./actions";
 import TempPassword from "./TempPassword";
 
 export const metadata: Metadata = { title: "Administración" };
@@ -68,7 +68,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               <thead>
                 <tr>
                   <th>Vendedor</th><th>Contacto</th><th>Estado</th><th>Débito</th><th>Vence</th><th>Último pago</th>
-                  <th>Publicados</th><th>Vendidos</th><th>Cobro manual</th><th>Cuenta</th><th>Acceso</th>
+                  <th>Publicados</th><th>Vendidos</th><th>Cobro manual / gratis</th><th>Cuenta</th><th>Acceso</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,7 +76,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                   <tr key={s.id}>
                     <td><strong>{s.display_name}</strong>{s.role === "admin" && " (admin)"}<br /><small>{s.city ?? ""}</small></td>
                     <td>{s.email}<br /><small>{s.whatsapp ? `+${s.whatsapp}` : "Sin WhatsApp"}</small></td>
-                    <td><span className={`badge ${BADGE[s.state]}`}>{STATE_COPY[s.state].label}</span></td>
+                    <td><span className={`badge ${BADGE[s.state]}`}>{STATE_COPY[s.state].label}</span>{s.is_free && s.state === "activo" && <> <span className="badge badge-gratis">Gratis</span></>}</td>
                     <td>{s.mp_preapproval_status === "authorized" ? "Activo" : s.mp_preapproval_status ?? "—"}</td>
                     <td>{formatDate(s.paid_until)}</td>
                     <td>{s.last_payment_at ? formatDate(s.last_payment_at) : "—"}</td>
@@ -85,9 +85,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                     <td>
                       <form action={setPaidUntil}>
                         <input type="hidden" name="id" value={s.id} />
-                        <label className="sr-only" htmlFor={`m-${s.id}`}>Pago hasta</label>
-                        <input id={`m-${s.id}`} type="date" name="until" defaultValue={inAMonth} className="input" style={{ minHeight: 36, padding: "4px 8px", width: 160 }} />
+                        <label className="sr-only" htmlFor={`m-${s.id}`}>Hasta</label>
+                        <input id={`m-${s.id}`} type="date" name="until" defaultValue={s.paid_until && s.paid_until > todayISO() ? s.paid_until : inAMonth} className="input" style={{ minHeight: 36, padding: "4px 8px", width: 160 }} />
                         <button className="btn btn-ghost btn-sm">Marcar pago</button>
+                        <button className="btn btn-sm btn-gratis" formAction={setFree}>Gratis</button>
                       </form>
                     </td>
                     <td>

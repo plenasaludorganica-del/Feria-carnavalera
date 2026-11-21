@@ -23,6 +23,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
   const live = state === "activo";
   const copy = STATE_COPY[state];
   const left = daysLeft(profile.paid_until);
+  const free = Boolean(profile.is_free) && live;
 
   const hasContact = Boolean(profile.whatsapp);
   const hasProducts = products.some((p) => p.status === "active");
@@ -36,7 +37,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
 
       {sp.clave && <p className="form-ok paper" role="status" style={{ marginBottom: 16 }}>Listo, tu contraseña nueva quedó guardada.</p>}
 
-      {live && left <= 7 && (
+      {live && !free && left <= 7 && (
         <div className={`renew-banner${profile.mp_preapproval_status === "authorized" ? " is-auto" : ""}`} role="status" data-fx="rise">
           <div>
             <strong>
@@ -112,10 +113,14 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
           {live && (
             <div className="paper">
               <div className="status" data-tone={copy.tone}>
-                <strong>{copy.label}</strong>
+                <strong>{free ? "Cuenta gratis" : copy.label}</strong>
                 <span>Vence el {formatDate(profile.paid_until)}{left >= 0 ? ` (${left === 0 ? "hoy" : `en ${left} días`})` : ""}</span>
               </div>
-              {profile.mp_preapproval_status === "authorized" ? (
+              {free ? (
+                <p className="sub" style={{ margin: "0 0 12px" }}>
+                  Tenés la cuenta <strong>gratis</strong> hasta el {formatDate(profile.paid_until)}. No tenés que pagar nada hasta esa fecha.
+                </p>
+              ) : profile.mp_preapproval_status === "authorized" ? (
                 <>
                   <p className="sub" style={{ margin: "0 0 12px" }}>
                     Débito automático activo: Mercado Pago renueva tu cuota sola todos los meses el día {Number((profile.paid_until ?? "").slice(8, 10)) || "—"}.

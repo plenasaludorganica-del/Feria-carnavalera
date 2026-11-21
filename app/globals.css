@@ -1012,3 +1012,6 @@ html, body { overflow-x: clip; }
 .fb-item-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
 .fb-item-stars { color: #ffb21f; font-size: 1.2rem; letter-spacing: 2px; }
 .fb-item small { color: var(--tinta-suave); }
+.btn-gratis { background: #138a5b; color: #fff; box-shadow: 0 0 12px #138a5b66; }
+.btn-gratis:hover { background: #0f7a50; }
+.badge-gratis { background: #138a5b; color: #fff; }

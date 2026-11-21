@@ -13,6 +13,7 @@ export interface Profile {
   admin_note: string | null;
   mp_preapproval_id: string | null;
   sold_count?: number;
+  is_free?: boolean;
   mp_preapproval_status: "pending" | "authorized" | "paused" | "cancelled" | null;
 }
 
@@ -67,5 +68,6 @@ export interface AdminSeller {
   mp_preapproval_status: string | null;
   products_count: number;
   sold_count: number;
+  is_free: boolean;
   last_payment_at: string | null;
 }

@@ -12,6 +12,15 @@ export async function toggleSuspend(form: FormData) {
   revalidatePath("/admin");
 }
 
+/** Cuenta gratis: no paga hasta la fecha elegida. */
+export async function setFree(form: FormData) {
+  const { supabase } = await requireUser("/admin");
+  const until = String(form.get("until") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(until)) return;
+  await supabase.rpc("admin_set_free", { uid: String(form.get("id")), until });
+  revalidatePath("/admin");
+}
+
 /** Cobro manual (efectivo o transferencia): deja paga la cuota hasta la fecha elegida. */
 export async function setPaidUntil(form: FormData) {
   const { supabase } = await requireUser("/admin");
