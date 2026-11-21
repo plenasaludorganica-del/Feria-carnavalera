@@ -14,7 +14,7 @@ export async function getSessionProfile() {
   if (!user) return { user: null, profile: null, supabase };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, display_name, whatsapp, city, role, paid_until, suspended, admin_note")
+    .select("id, display_name, whatsapp, city, role, paid_until, suspended, admin_note, mp_preapproval_id, mp_preapproval_status, sold_count")
     .eq("id", user.id)
     .single<Profile>();
   return { user, profile, supabase };

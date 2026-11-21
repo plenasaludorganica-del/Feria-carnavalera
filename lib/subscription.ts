@@ -11,10 +11,15 @@ export function endOfMonthISO(iso: string) {
   return `${y}-${String(m).padStart(2, "0")}-${String(last).padStart(2, "0")}`;
 }
 
-export function subscriptionState(p: Pick<Profile, "paid_until" | "suspended">): SubscriptionState {
+/** Misma regla que public.paid_ok() en SQL: 3 días de gracia solo con débito automático activo. */
+export function subscriptionState(
+  p: Pick<Profile, "paid_until" | "suspended"> & { mp_preapproval_status?: string | null },
+): SubscriptionState {
   if (p.suspended) return "suspendido";
   if (!p.paid_until) return "sin_pago";
-  return p.paid_until >= todayISO() ? "activo" : "vencido";
+  const grace = p.mp_preapproval_status === "authorized" ? 3 : 0;
+  const limit = new Date(Date.parse(p.paid_until + "T12:00:00Z") + grace * 86_400_000).toISOString().slice(0, 10);
+  return limit >= todayISO() ? "activo" : "vencido";
 }
 
 export function daysLeft(paidUntil: string | null) {

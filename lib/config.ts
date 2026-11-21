@@ -58,3 +58,8 @@ export function normalizeWhatsapp(raw: string) {
   if (d.length === 12 && d.startsWith("54") && !d.startsWith("549")) d = "549" + d.slice(2);
   return d;
 }
+
+/** Miniatura (480px) que se sube junto a cada foto. Las imágenes de muestra no tienen. */
+export function thumbUrl(src: string) {
+  return src.includes("/product-images/") && src.endsWith(".webp") ? src.replace(/\.webp$/, "_t.webp") : src;
+}

@@ -16,11 +16,12 @@
 --  y todo vuelve a verse tal cual estaba.
 -- =====================================================================
 
-create extension if not exists pg_trgm;
+create schema if not exists extensions;
+create extension if not exists pg_trgm with schema extensions;
 
 -- ---------------------------------------------------------------------
 -- Fecha "de hoy" en la zona horaria del negocio.
--- Si operás desde Uruguay cambiá a 'America/Montevideo'.
+-- (Argentina. Si algún día suman Uruguay: America/Montevideo.)
 -- ---------------------------------------------------------------------
 create or replace function public.app_today()
 returns date
@@ -63,6 +64,9 @@ create table if not exists public.profiles (
   paid_until    date,                       -- null = nunca pagó
   suspended     boolean not null default false,  -- bloqueo manual del admin
   admin_note    text,
+  -- Débito automático (suscripción de Mercado Pago)
+  mp_preapproval_id     text unique,
+  mp_preapproval_status text,              -- pending | authorized | paused | cancelled
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -93,6 +97,17 @@ create trigger on_auth_user_created
 -- ---------------------------------------------------------------------
 -- Helpers de estado
 -- ---------------------------------------------------------------------
+-- Días de gracia SOLO para quien tiene débito automático activo: Mercado Pago
+-- cobra el día 1 y puede tardar unas horas o reintentar. Sin débito: 0 días.
+create or replace function public.paid_ok(p_paid_until date, p_suspended boolean, p_mp_status text)
+returns boolean
+language sql stable
+set search_path = ''
+as $$
+  select not coalesce(p_suspended, false)
+     and p_paid_until is not null
+     and p_paid_until + (case when p_mp_status = 'authorized' then 3 else 0 end) >= public.app_today()
+$$;
 create or replace function public.is_admin()
 returns boolean
 language sql stable security definer
@@ -109,9 +124,7 @@ as $$
   select exists (
     select 1 from public.profiles p
     where p.id = uid
-      and not p.suspended
-      and p.paid_until is not null
-      and p.paid_until >= public.app_today()
+      and public.paid_ok(p.paid_until, p.suspended, p.mp_preapproval_status)
   )
 $$;
 
@@ -124,7 +137,7 @@ as $$
   select case
     when p.suspended then 'suspendido'
     when p.paid_until is null then 'sin_pago'
-    when p.paid_until >= public.app_today() then 'activo'
+    when public.paid_ok(p.paid_until, p.suspended, p.mp_preapproval_status) then 'activo'
     else 'vencido'
   end
 $$;
@@ -149,8 +162,8 @@ create table if not exists public.products (
 
 create index if not exists products_seller_idx   on public.products (seller_id);
 create index if not exists products_cat_idx      on public.products (category, created_at desc);
-create index if not exists products_title_trgm   on public.products using gin (title gin_trgm_ops);
-create index if not exists products_desc_trgm    on public.products using gin (description gin_trgm_ops);
+create index if not exists products_title_trgm   on public.products using gin (title extensions.gin_trgm_ops);
+create index if not exists products_desc_trgm    on public.products using gin (description extensions.gin_trgm_ops);
 
 -- updated_at automático
 create or replace function public.touch_updated_at()
@@ -247,6 +260,21 @@ revoke all on function public.register_payment from public, anon, authenticated;
 grant execute on function public.register_payment to service_role;
 
 -- ---------------------------------------------------------------------
+-- DÉBITO AUTOMÁTICO: guardar el estado de la suscripción (lo llama el webhook)
+-- ---------------------------------------------------------------------
+create or replace function public.set_preapproval(p_user_id uuid, p_preapproval_id text, p_status text)
+returns void
+language sql security definer
+set search_path = ''
+as $$
+  update public.profiles
+     set mp_preapproval_id = p_preapproval_id, mp_preapproval_status = p_status
+   where id = p_user_id
+$$;
+revoke all on function public.set_preapproval from public, anon, authenticated;
+grant execute on function public.set_preapproval to service_role;
+
+-- ---------------------------------------------------------------------
 -- CATÁLOGO PÚBLICO (solo vendedores activos, con WhatsApp, producto activo)
 -- Se expone por funciones para no abrir la tabla de perfiles al público.
 -- ---------------------------------------------------------------------
@@ -269,8 +297,7 @@ as $$
   from public.products p
   join public.profiles pr on pr.id = p.seller_id
   where p.status = 'active'
-    and not pr.suspended
-    and pr.paid_until >= public.app_today()
+    and public.paid_ok(pr.paid_until, pr.suspended, pr.mp_preapproval_status)
     and pr.whatsapp is not null
     and (cat is null or p.category = cat)
     and (q is null or q = '' or p.title ilike '%' || q || '%' or p.description ilike '%' || q || '%')
@@ -293,8 +320,7 @@ as $$
   join public.profiles pr on pr.id = p.seller_id
   where p.id = pid
     and p.status = 'active'
-    and not pr.suspended
-    and pr.paid_until >= public.app_today()
+    and public.paid_ok(pr.paid_until, pr.suspended, pr.mp_preapproval_status)
     and pr.whatsapp is not null
 $$;
 
@@ -328,7 +354,7 @@ grant execute on function public.admin_set_paid_until to authenticated;
 create or replace view public.admin_sellers
 with (security_invoker = true) as
 select p.id, p.display_name, u.email, p.whatsapp, p.city, p.role, p.paid_until, p.suspended,
-       p.admin_note, p.created_at,
+       p.admin_note, p.created_at, p.mp_preapproval_status,
        public.subscription_state(p) as state,
        (select count(*) from public.products x where x.seller_id = p.id) as products_count,
        (select max(created_at) from public.payments y where y.user_id = p.id and y.status in ('approved','manual')) as last_payment_at

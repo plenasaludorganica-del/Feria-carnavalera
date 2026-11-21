@@ -10,7 +10,8 @@ import SiteHeader from "@/components/SiteHeader";
 import SparkleRain from "@/components/SparkleRain";
 import { searchCatalog } from "@/lib/catalog";
 
-export const revalidate = 60;
+// Siempre fresco: muestra al instante quién se dio de alta o venció.
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const { items } = await searchCatalog({});

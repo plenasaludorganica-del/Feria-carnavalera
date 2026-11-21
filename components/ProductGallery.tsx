@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { IconBrillo } from "./icons";
+import { thumbUrl } from "@/lib/config";
 
 export default function ProductGallery({ images, title }: { images: string[]; title: string }) {
   const [i, setI] = useState(0);
@@ -20,7 +21,7 @@ export default function ProductGallery({ images, title }: { images: string[]; ti
         <div className="thumbs" role="group" aria-label="Fotos">
           {images.map((src, idx) => (
             <button key={src} type="button" aria-pressed={idx === i} aria-label={`Ver foto ${idx + 1}`} onClick={() => setI(idx)}>
-              <Image src={src} alt="" width={72} height={72} />
+              <Image src={thumbUrl(src)} alt="" width={72} height={72} />
             </button>
           ))}
         </div>

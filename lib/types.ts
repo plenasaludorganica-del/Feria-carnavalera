@@ -11,6 +11,9 @@ export interface Profile {
   paid_until: string | null;
   suspended: boolean;
   admin_note: string | null;
+  mp_preapproval_id: string | null;
+  sold_count?: number;
+  mp_preapproval_status: "pending" | "authorized" | "paused" | "cancelled" | null;
 }
 
 export interface CatalogItem {
@@ -60,6 +63,8 @@ export interface AdminSeller {
   admin_note: string | null;
   created_at: string;
   state: SubscriptionState;
+  mp_preapproval_status: string | null;
   products_count: number;
+  sold_count: number;
   last_payment_at: string | null;
 }

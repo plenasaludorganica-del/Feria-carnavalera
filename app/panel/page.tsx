@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categoryLabel, formatDate, formatPrice } from "@/lib/config";
+import { categoryLabel, formatDate, formatPrice, thumbUrl } from "@/lib/config";
 import { requireUser } from "@/lib/session";
 import { STATE_COPY, daysLeft } from "@/lib/subscription";
 import type { OwnProduct } from "@/lib/types";
 import ProfileForm from "./ProfileForm";
-import { deleteProduct, setProductStatus } from "./actions";
+import ConfirmButton from "@/components/ConfirmButton";
+import { cancelAutoDebit, deleteProduct, markSold, setProductStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Mi panel" };
 
-export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string }> }) {
+export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string; vendido?: string }> }) {
   const sp = await searchParams;
   const { supabase, profile, state, user } = await requireUser("/panel");
   const { data } = await supabase
@@ -34,10 +35,23 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
               <strong>{copy.label}</strong>
               <span>Vence el {formatDate(profile.paid_until)}{left >= 0 ? ` (${left === 0 ? "hoy" : `en ${left} días`})` : ""}</span>
             </div>
-            <p className="sub" style={{ margin: "0 0 12px" }}>
-              La cuota vence el último día de cada mes. Si no la renovás, tus publicaciones se ocultan, pero no se borran.
-            </p>
-            <Link href="/suscripcion" className="btn btn-ghost" style={{ width: "100%" }}>Adelantar el próximo mes</Link>
+            {profile.mp_preapproval_status === "authorized" ? (
+              <>
+                <p className="sub" style={{ margin: "0 0 12px" }}>
+                  Débito automático activo: Mercado Pago renueva tu cuota sola el día 1 de cada mes.
+                </p>
+                <form action={cancelAutoDebit}>
+                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }}>Dar de baja el débito automático</button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="sub" style={{ margin: "0 0 12px" }}>
+                  Sin débito automático: la cuota vence el último día del mes. Si no la renovás, tus publicaciones se ocultan, pero no se borran.
+                </p>
+                <Link href="/suscripcion" className="btn btn-oro" style={{ width: "100%" }}>Activar débito automático</Link>
+              </>
+            )}
           </div>
           <div className="paper"><ProfileForm profile={profile} /></div>
           <form action="/auth/salir" method="post">
@@ -51,6 +65,12 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             {profile.whatsapp && <Link href="/panel/publicar" className="btn btn-oro">Publicar un insumo</Link>}
           </div>
           {sp.guardado && <p className="form-ok" role="status">Publicación guardada.</p>}
+          {sp.vendido && <p className="form-ok" role="status">¡Felicitaciones por la venta! La publicación se quitó de la feria.</p>}
+          {(profile.sold_count ?? 0) > 0 && (
+            <p className="sub" style={{ margin: "0 0 12px" }}>
+              Ya vendiste {profile.sold_count === 1 ? "1 insumo" : `${profile.sold_count} insumos`} en la feria.
+            </p>
+          )}
           {!profile.whatsapp && (
             <div className="notice">Cargá tu WhatsApp en “Tus datos de contacto” para poder publicar. Es la forma en que te contactan los compradores.</div>
           )}
@@ -69,7 +89,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                   <li key={p.id} className="myitem" data-paused={paused}>
                     {p.images[0]
                       // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={p.images[0]} alt="" loading="lazy" />
+                      ? <img src={thumbUrl(p.images[0])} alt="" loading="lazy" />
                       : <div className="ph" />}
                     <div>
                       <h3>{p.title}</h3>
@@ -80,6 +100,16 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                       </div>
                     </div>
                     <div className="actions">
+                      <form action={markSold}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <ConfirmButton
+                          className="btn btn-vendido btn-sm"
+                          message={`¿Vendiste “${p.title}”? Se quita de la feria y se borran sus fotos. No se puede deshacer.`}
+                          pendingLabel="Quitando…"
+                        >
+                          Ya lo vendí
+                        </ConfirmButton>
+                      </form>
                       {!paused && <Link className="btn btn-ghost btn-sm" href={`/producto/${p.id}`}>Ver</Link>}
                       <Link className="btn btn-ghost btn-sm" href={`/panel/editar/${p.id}`}>Editar</Link>
                       <form action={setProductStatus}>
@@ -89,7 +119,14 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                       </form>
                       <form action={deleteProduct}>
                         <input type="hidden" name="id" value={p.id} />
-                        <button className="btn btn-peligro btn-sm" aria-label={`Eliminar ${p.title}`}>Eliminar</button>
+                        <ConfirmButton
+                          className="btn btn-peligro btn-sm"
+                          ariaLabel={`Eliminar ${p.title}`}
+                          message={`¿Eliminar “${p.title}”? Se borran la publicación y sus fotos.`}
+                          pendingLabel="Eliminando…"
+                        >
+                          Eliminar
+                        </ConfirmButton>
                       </form>
                     </div>
                   </li>
