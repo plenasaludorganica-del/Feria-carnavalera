@@ -881,62 +881,74 @@ html:not(.intro-off) .hero { --intro-delay: 1.15s; }
 
 
 /* =========================================================
-   PALETA DE VENTA: fondo vino cálido + neón fucsia/naranja/oro
+   PALETA FRESCA: amarillo + naranja de base, vino solo como neón
+   (la portada, el encabezado y la entrada siguen oscuros)
    ========================================================= */
-.sheet {
-  background:
-    radial-gradient(60% 40% at 15% 8%, #ff2e9326, transparent 70%),
-    radial-gradient(50% 35% at 90% 30%, #ff7a1a1f, transparent 70%),
-    radial-gradient(70% 40% at 50% 85%, #ffc23d14, transparent 70%),
-    var(--noche);
+:root {
+  --sol: linear-gradient(170deg, #ffe45c 0%, #ffc233 38%, #ff9a1f 75%, #ff7a1a 100%);
+  --texto: #3d0a22;          /* vino muy oscuro para leer sobre amarillo */
+  --texto-suave: #6e2547;
+  --neon: #e0115f;           /* vino neón */
 }
-.page {
-  background:
-    radial-gradient(60% 30% at 85% 0%, #ff2e9322, transparent 70%),
-    radial-gradient(50% 30% at 0% 40%, #ff7a1a18, transparent 70%);
-}
+body { background: #ffb02e; }
+.sheet, .page { color: var(--texto); }
+.sheet { background: var(--sol); box-shadow: 0 -30px 60px -20px #000c, 0 -2px 0 #ffe45c; }
+.page { background: var(--sol); min-height: 100svh; }
+.sheet-feathers, .page-bg { opacity: .12; mix-blend-mode: multiply; }
 
-/* Botón principal: naranja-dorado con halo neón (el más llamativo de la página) */
+/* Textos sobre el amarillo */
+.section-head h2, .page-title { color: var(--texto); text-shadow: 0 2px 0 #ffffff66; }
+.section-head a, .crumbs a { color: var(--texto); text-decoration-color: var(--neon); }
+.results-note, .crumbs { color: var(--texto-suave); }
+.site-footer { color: var(--texto-suave); border-top-color: #3d0a2222; }
+.site-footer a { color: var(--texto); }
+
+/* Botones */
 .btn-oro {
-  background: linear-gradient(180deg, #ffd65c 0%, #ffa21f 50%, #ff6a1a 100%);
-  color: #2a0a00;
-  box-shadow:
-    0 1px 0 #fff8 inset,
-    0 0 0 1px #ffd65c88,
-    0 0 18px #ff8a1fb3,
-    0 0 46px #ff2e9366;
+  background: linear-gradient(180deg, #ffe45c 0%, #ffb21f 55%, #ff7a1a 100%);
+  color: #3d0a22;
+  box-shadow: 0 1px 0 #fff9 inset, 0 0 0 1px #ffe45c, 0 0 18px #ff9a1fcc, 0 0 44px #e0115f66;
 }
-.btn-oro:hover { box-shadow: 0 1px 0 #fff8 inset, 0 0 0 1px #ffe08a, 0 0 26px #ff8a1fe6, 0 0 70px #ff2e9399; }
+.btn-oro:hover { box-shadow: 0 1px 0 #fff9 inset, 0 0 0 1px #fff3a0, 0 0 26px #ff9a1f, 0 0 64px #e0115f99; }
 @media all { .hero-cta-main.btn-oro { animation: neon-pulse 2.6s ease-in-out infinite; } }
-@keyframes neon-pulse {
-  50% { box-shadow: 0 1px 0 #fff8 inset, 0 0 0 1px #ffe08a, 0 0 30px #ff8a1fff, 0 0 80px #ff2e93aa; }
-}
+@keyframes neon-pulse { 50% { box-shadow: 0 1px 0 #fff9 inset, 0 0 0 1px #fff3a0, 0 0 30px #ffb21f, 0 0 80px #e0115faa; } }
+/* sobre el amarillo, el botón dorado se separa con un borde vino */
+.sheet .btn-oro, .page .btn-oro { box-shadow: 0 1px 0 #fff9 inset, 0 0 0 2px #3d0a22, 0 6px 0 #3d0a22, 0 0 30px #e0115f88; }
+.btn-fucsia { background: linear-gradient(180deg, #ff3d8a, #e0115f); color: #fff; box-shadow: 0 0 16px #e0115faa, 0 0 40px #e0115f55; }
+.btn-fucsia:hover { box-shadow: 0 0 24px #e0115fdd, 0 0 60px #e0115f77; }
+.sheet .btn-claro, .page .btn-claro { background: #ffffffb3; color: var(--texto); box-shadow: 0 0 0 1px #3d0a2222; }
+.sheet .btn-claro:hover, .page .btn-claro:hover { background: #fff; box-shadow: 0 0 18px #e0115f55; }
 
-/* Botón secundario de acción: fucsia neón */
-.btn-fucsia { background: var(--fucsia); color: #fff; box-shadow: 0 0 16px #ff2e93aa, 0 0 40px #ff2e9355; }
-.btn-fucsia:hover { background: #ff4aa3; box-shadow: 0 0 22px #ff2e93dd, 0 0 56px #ff2e9377; }
+/* Buscador */
+.search { box-shadow: 0 16px 40px -18px #7a1a0080, 0 0 0 3px #e0115f55, 0 0 28px #e0115f44; }
+.search:focus-within { box-shadow: 0 16px 40px -18px #7a1a0080, 0 0 0 3px var(--neon), 0 0 36px #e0115f88; }
 
-/* Buscador con anillo neón */
-.search { box-shadow: 0 20px 50px -20px #000, 0 0 0 3px #ff2e9366, 0 0 30px #ff2e9344; }
-.search:focus-within { box-shadow: 0 20px 50px -20px #000, 0 0 0 3px var(--oro), 0 0 36px #ffc23d77; }
+/* Categorías */
+.cat { background: #ffffffa8; color: var(--texto); box-shadow: 0 0 0 1px #e0115f33, 0 8px 20px -12px #7a1a0080; }
+.cat:hover { background: #fff; box-shadow: 0 0 0 2px var(--neon), 0 0 24px #e0115f77; }
+.cat[aria-current="page"] { background: var(--texto); color: #fff; box-shadow: 0 0 0 2px var(--neon), 0 0 28px #e0115f99; }
+.cat svg { filter: drop-shadow(0 0 5px #e0115f66); }
 
-/* Categorías: borde neón suave que se enciende al pasar */
-.cat { background: #ffffff0a; box-shadow: inset 0 0 0 1px #ff2e9355, 0 0 18px #ff2e931a; }
-.cat:hover { background: #ff2e931a; box-shadow: inset 0 0 0 1px #ff2e93, 0 0 22px #ff2e9366; }
-.cat svg { filter: drop-shadow(0 0 6px #ff2e9399); }
-
-/* Tarjetas blancas: se iluminan en neón al tocarlas */
-.tag:hover, .tag.tilting {
-  box-shadow: 0 0 0 2px #ff2e93, 0 0 26px #ff2e9399, 0 0 70px #ffc23d44, 0 18px 40px -24px #000;
-}
+/* Tarjetas blancas con sombra neón vino */
+.tag { box-shadow: 0 10px 30px -14px #7a1a00aa; }
+.tag:hover, .tag.tilting { box-shadow: 0 0 0 2px var(--neon), 0 0 26px #e0115fa6, 0 0 64px #e0115f44, 0 18px 40px -20px #7a1a00; }
+.tag::before { background: #ffb02e; }
 .tag-price { color: #c4002f; }
 
-/* Títulos con un leve resplandor */
-.section-head h2, .page-title { text-shadow: 0 0 22px #ff2e9355; }
-
-/* Pasos y bloques destacados en vino con borde neón */
-.steps li { background: linear-gradient(160deg, #3a0f2c, #1c0716); box-shadow: inset 0 0 0 1px #ff2e9344, 0 0 30px #ff2e931f; }
-.steps li::before { background: linear-gradient(180deg, #ffd65c, #ff7a1a); color: #2a0a00; box-shadow: 0 0 16px #ff8a1fb3; }
-.share-card { background: linear-gradient(135deg, #3a0f2c, #1c0716 60%); box-shadow: inset 0 0 0 1px #ff2e9366, 0 0 40px #ff2e9326; }
-.cta-band { box-shadow: 0 0 50px #ff2e9355; }
-.site-header[data-solid="true"] { box-shadow: 0 1px 0 #ff2e9344, 0 8px 30px -12px #ff2e9355; }
+/* Bloques */
+.steps li { background: #ffffffc7; color: var(--texto); box-shadow: 0 0 0 1px #e0115f33, 0 0 26px #e0115f2e; }
+.steps li::before { background: linear-gradient(180deg, #ffe45c, #ff7a1a); color: #3d0a22; box-shadow: 0 0 0 2px #3d0a22, 0 0 16px #e0115f88; }
+.steps p { color: var(--texto-suave); }
+.share-card { background: linear-gradient(135deg, #ff3d8a, #e0115f 55%, #a30b45); color: #fff; box-shadow: 0 0 40px #e0115f77; }
+.share-card p { color: #ffe8f1; }
+.share-card .btn-claro { background: #ffffff33; color: #fff; }
+.empty { background: #ffffffb3; color: var(--texto); box-shadow: 0 0 0 1px #e0115f33; }
+.empty p { color: var(--texto-suave); }
+.cta-band { box-shadow: 0 0 50px #e0115f66; }
+.stats div { background: #ffffffb3; color: var(--texto); box-shadow: 0 0 0 1px #e0115f33; }
+.preview-bar { background: #ffffffc7; box-shadow: 0 0 0 2px var(--neon), 0 0 24px #e0115f55; color: var(--texto); }
+.preview-bar span { color: var(--texto-suave); }
+.renew-banner { box-shadow: 0 0 0 2px var(--neon), 0 0 30px #e0115f66; }
+.paper { box-shadow: 0 20px 50px -30px #7a1a00, 0 0 0 1px #e0115f22; }
+.pager span { color: var(--texto); }
+.site-header[data-solid="true"] { background: #1a0811f0; box-shadow: 0 1px 0 #e0115f66, 0 8px 30px -12px #e0115f66; }
