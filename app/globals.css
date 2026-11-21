@@ -700,7 +700,7 @@ table.admin td:first-child, table.admin td:nth-child(2) { min-width: 160px; }
     intro-out .5s 2.45s cubic-bezier(.4, 0, .2, 1) forwards;
 }
 @keyframes intro-bg-out { to { background-color: transparent; } }
-.intro-off .intro { display: none; }
+.intro-off .intro, .intro-done .intro { display: none; }
 .intro-stage { position: absolute; inset: 0; perspective: 1600px; overflow: hidden; }
 .intro-panel {
   position: absolute; top: -4%; bottom: -4%; width: 56%;
