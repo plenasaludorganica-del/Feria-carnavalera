@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import { formatDate, formatPrice } from "@/lib/config";
+import { getMonthlyPrice } from "@/lib/mercadopago";
 import { requireUser } from "@/lib/session";
 import { endOfMonthISO, todayISO } from "@/lib/subscription";
 
@@ -11,7 +12,7 @@ export default async function Suscripcion({ searchParams }: { searchParams: Prom
   const { error } = await searchParams;
   const { profile, state, user } = await requireUser("/suscripcion");
   // Se leen en cada request (en Cloudflare las variables llegan con la petición).
-  const price = Number(process.env.MP_MONTHLY_PRICE ?? 5000);
+  const price = await getMonthlyPrice();
   const currency = process.env.MP_CURRENCY ?? "ARS";
 
   // Hasta qué fecha cubriría este pago (misma regla que register_payment en SQL)

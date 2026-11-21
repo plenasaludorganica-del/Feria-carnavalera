@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     url.searchParams.get("id");
   if (!type || !dataId) return NextResponse.json({ ignored: true });
 
-  const ok = verifySignature({
+  const ok = await verifySignature({
     signature: req.headers.get("x-signature"),
     requestId: req.headers.get("x-request-id"),
     dataId,

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import { formatDate } from "@/lib/config";
@@ -36,7 +37,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       <SiteHeader />
       <main className="page">
         <div className="wrap" style={{ paddingBottom: 64 }}>
-          <h1 className="page-title" style={{ marginBottom: 20 }}>Vendedores</h1>
+          <div className="section-head" style={{ marginBottom: 20 }}>
+            <h1 className="page-title" style={{ margin: 0 }}>Vendedores</h1>
+            <Link href="/admin/pagos" className="btn btn-oro">Pagos y precio</Link>
+          </div>
           <div className="stats">
             <div><b>{count("activo")}</b>Al día</div>
             <div><b>{count("vencido")}</b>Vencidos</div>

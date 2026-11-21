@@ -67,6 +67,11 @@ Copiá `.env.example` a `.env.local` y completalo. En Cloudflare se cargan como 
 2. Copiá el Access Token a `MP_ACCESS_TOKEN`. Usá uno `TEST-...` para probar: el sistema usa el checkout de prueba automáticamente.
 3. En **Webhooks**, cargá la URL `https://TU-DOMINIO/api/mp/webhook` con los eventos **Pagos**, **Planes y suscripciones** y **Pagos recurrentes**. Copiá la clave secreta a `MP_WEBHOOK_SECRET`.
 
+### Configurar pagos sin tocar Cloudflare
+En **Admin → Pagos y precio** se cargan el token de Mercado Pago y la clave del webhook. Quedan cifrados en Supabase Vault y solo el servidor puede leerlos. Ahí también se define el precio de la cuota y hay un botón **Probar conexión**.
+
+La Feria también **consulta a Mercado Pago** cuando el vendedor vuelve del pago y cuando entra a su panel. Por eso las cuentas se activan aunque el webhook no esté configurado; con el webhook, las renovaciones se acreditan al instante.
+
 ### Débito automático
 - El botón principal crea una suscripción de Mercado Pago (`/preapproval`) con cobro el **día 1 de cada mes**. El primer cobro es proporcional a los días que quedan del mes.
 - Cada cobro llega al webhook como "Pagos recurrentes" y extiende `paid_until` hasta el fin de mes.

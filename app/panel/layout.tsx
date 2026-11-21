@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import { supabaseConfigured } from "@/lib/config";
+import { syncUserBilling } from "@/lib/billing-sync";
 import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       </>
     );
   }
-  const { state } = await requireUser("/panel");
+  const { state, profile } = await requireUser("/panel");
+  // Si no está al día pero tiene débito automático, consulta a Mercado Pago por si ya pagó.
+  if (state !== "activo" && profile.mp_preapproval_id) await syncUserBilling(profile.id);
   if (state === "suspendido") redirect("/suscripcion");
   return (
     <>
