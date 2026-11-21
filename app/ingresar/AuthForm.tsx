@@ -1,5 +1,7 @@
 "use client";
+import Link from "next/link";
 import { useActionState } from "react";
+import PasswordInput from "@/components/PasswordInput";
 import { signIn, signUp, type AuthState } from "./actions";
 
 export default function AuthForm({ mode, next }: { mode: "ingreso" | "registro"; next: string }) {
@@ -22,11 +24,16 @@ export default function AuthForm({ mode, next }: { mode: "ingreso" | "registro";
       </div>
       <div className="field">
         <label htmlFor="password">Contraseña</label>
-        <input
-          className="input" id="password" name="password" type="password" required minLength={mode === "registro" ? 8 : 1}
+        <PasswordInput
+          id="password"
+          name="password"
+          minLength={mode === "registro" ? 8 : 1}
           autoComplete={mode === "registro" ? "new-password" : "current-password"}
         />
         {mode === "registro" && <span className="help">Mínimo 8 caracteres.</span>}
+        {mode === "ingreso" && (
+          <Link href="/recuperar" className="forgot">¿Olvidaste tu contraseña?</Link>
+        )}
       </div>
       <button className="btn btn-fucsia" style={{ width: "100%" }} disabled={pending}>
         {pending ? "Un momento…" : mode === "registro" ? "Crear cuenta y armar mi puesto" : "Ingresar"}

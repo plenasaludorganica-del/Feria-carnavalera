@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/session";
 import { STATE_COPY, todayISO } from "@/lib/subscription";
 import type { AdminSeller, SubscriptionState } from "@/lib/types";
 import { setPaidUntil, toggleSuspend } from "./actions";
+import TempPassword from "./TempPassword";
 
 export const metadata: Metadata = { title: "Administración" };
 export const dynamic = "force-dynamic";
@@ -60,7 +61,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               <thead>
                 <tr>
                   <th>Vendedor</th><th>Contacto</th><th>Estado</th><th>Débito</th><th>Vence</th><th>Último pago</th>
-                  <th>Publicados</th><th>Vendidos</th><th>Cobro manual</th><th>Cuenta</th>
+                  <th>Publicados</th><th>Vendidos</th><th>Cobro manual</th><th>Cuenta</th><th>Acceso</th>
                 </tr>
               </thead>
               <tbody>
@@ -91,9 +92,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                         </button>
                       </form>
                     </td>
+                    <td><TempPassword id={s.id} name={s.display_name} whatsapp={s.whatsapp} /></td>
                   </tr>
                 ))}
-                {!rows.length && <tr><td colSpan={10} style={{ textAlign: "center", padding: 24 }}>No hay vendedores con ese filtro.</td></tr>}
+                {!rows.length && <tr><td colSpan={11} style={{ textAlign: "center", padding: 24 }}>No hay vendedores con ese filtro.</td></tr>}
               </tbody>
             </table>
           </div>

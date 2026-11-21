@@ -10,7 +10,7 @@ import { cancelAutoDebit, deleteProduct, markSold, setProductStatus } from "./ac
 
 export const metadata: Metadata = { title: "Mi panel" };
 
-export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string; vendido?: string }> }) {
+export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string; guardado?: string; vendido?: string; clave?: string }> }) {
   const sp = await searchParams;
   const { supabase, profile, state, user } = await requireUser("/panel");
   const { data } = await supabase
@@ -32,6 +32,8 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
       <h1 className="page-title" style={{ marginBottom: 20 }}>
         {sp.bienvenida ? `¡Bienvenido a la feria, ${profile.display_name}!` : `Hola, ${profile.display_name}`}
       </h1>
+
+      {sp.clave && <p className="form-ok paper" role="status" style={{ marginBottom: 16 }}>Listo, tu contraseña nueva quedó guardada.</p>}
 
       {!live && (
         <section className="paper setup" aria-labelledby="armar" data-fx="rise">

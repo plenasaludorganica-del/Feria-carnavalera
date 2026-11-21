@@ -20,3 +20,21 @@ export async function setPaidUntil(form: FormData) {
   await supabase.rpc("admin_set_paid_until", { uid: String(form.get("id")), until: `${month}-01`, note: "cobro manual" });
   revalidatePath("/admin");
 }
+
+export type TempPasswordState = { password?: string; error?: string };
+
+/** Genera una contraseña temporal fácil de dictar (sin letras confusas como l/1, O/0). */
+function tempPassword() {
+  const abc = "abcdefghjkmnpqrstuvwxyz23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  const body = Array.from(bytes, (b) => abc[b % abc.length]).join("");
+  return `feria-${body}`;
+}
+
+export async function makeTempPassword(_: TempPasswordState, form: FormData): Promise<TempPasswordState> {
+  const { supabase } = await requireUser("/admin");
+  const password = tempPassword();
+  const { error } = await supabase.rpc("admin_set_password", { uid: String(form.get("id")), new_password: password });
+  if (error) return { error: "No se pudo cambiar. Volvé a intentar." };
+  return { password };
+}

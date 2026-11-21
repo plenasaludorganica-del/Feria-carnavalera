@@ -643,3 +643,17 @@ table.admin td form { display: inline-flex; gap: 6px; align-items: center; }
 .setup-steps .btn-ghost { color: var(--tinta); }
 @media (max-width: 960px) { .setup-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .setup-steps { grid-template-columns: 1fr; } }
+
+/* ---------- Contraseña con ojito ---------- */
+.pw { position: relative; }
+.pw .input { padding-right: 52px; }
+.pw-eye {
+  position: absolute; top: 50%; right: 4px; translate: 0 -50%;
+  width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent;
+  color: var(--tinta-suave); cursor: pointer; display: grid; place-items: center;
+}
+.pw-eye:hover { color: var(--tinta); background: #f3eefa; }
+.pw-eye[aria-pressed="true"] { color: var(--fucsia); }
+.forgot { justify-self: end; font-size: .9rem; font-weight: 600; color: var(--fucsia); text-underline-offset: 3px; }
+.temp-pw { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.temp-pw code { padding: 4px 8px; border-radius: 8px; background: #fff3dc; color: #6b4100; font-size: .9rem; }
