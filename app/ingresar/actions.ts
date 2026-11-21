@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { supabaseConfigured } from "@/lib/config";
 import { getSiteUrl } from "@/lib/site-url";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string; info?: string };
@@ -30,6 +31,25 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (password.length < 8) return { error: "La contraseña tiene que tener al menos 8 caracteres." };
 
   const supabase = await createClient();
+
+  // Con la clave de servidor creamos la cuenta ya confirmada: no depende de
+  // que Supabase pueda mandar el email de confirmación.
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const { error: createError } = await createAdminClient().auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { display_name: name },
+    });
+    if (createError) {
+      const taken = /already|registered|exists/i.test(createError.message);
+      return { error: taken ? "Ese email ya tiene cuenta. Ingresá con tu contraseña." : "No se pudo crear la cuenta. Revisá el email e intentá de nuevo." };
+    }
+    const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+    if (loginError) return { error: "La cuenta se creó, pero no pudimos iniciar sesión. Probá ingresar." };
+    redirect("/suscripcion");
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
