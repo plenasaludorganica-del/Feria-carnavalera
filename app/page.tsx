@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { preload } from "react-dom";
 import Link from "next/link";
 import BrandWordmark from "@/components/BrandWordmark";
 import CategoryNav from "@/components/CategoryNav";
@@ -7,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import SearchBar from "@/components/SearchBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import IntroCurtain from "@/components/IntroCurtain";
 import ShareCard from "@/components/ShareCard";
 import SparkleRain from "@/components/SparkleRain";
 import { searchCatalog } from "@/lib/catalog";
@@ -15,11 +17,14 @@ import { searchCatalog } from "@/lib/catalog";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  // El telón de la entrada se pide primero que todo (es lo primero que se ve).
+  preload("/brand/telon-plumas.webp", { as: "image", fetchPriority: "high" });
   const { items } = await searchCatalog({});
   const latest = items.slice(0, 12);
 
   return (
     <>
+      <IntroCurtain />
       <SiteHeader overHero />
       <Parallax />
 
@@ -65,7 +70,7 @@ export default async function Home() {
 
           <section className="section" aria-labelledby="recien">
             <div className="section-head">
-              <h2 id="recien">Recién llegados a la feria</h2>
+              <h2 id="recien" data-fx="title">Recién llegados a la feria</h2>
               <Link href="/catalogo">Ver todo el catálogo</Link>
             </div>
             {latest.length ? (
@@ -84,7 +89,7 @@ export default async function Home() {
           </section>
 
           <section className="section" aria-labelledby="como">
-            <div className="section-head"><h2 id="como">Cómo vender en la feria</h2></div>
+            <div className="section-head"><h2 id="como" data-fx="title">Cómo vender en la feria</h2></div>
             <ol className="steps">
               <li data-fx="rise">
                 <h3>Creá tu cuenta</h3>

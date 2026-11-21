@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Bagel_Fat_One, Bricolage_Grotesque } from "next/font/google";
 import ScrollFX from "@/components/ScrollFX";
+import SmoothScroll from "@/components/SmoothScroll";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage", display: "swap" });
@@ -33,13 +35,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('fx-on')",
+              "(function(){var r=document.documentElement,m=matchMedia('(prefers-reduced-motion: reduce)').matches,s=null;try{s=sessionStorage.getItem('feria-intro')}catch(e){}if(!m)r.classList.add('fx-on');if(m||s)r.classList.add('intro-off')})()",
           }}
         />
       </head>
       <body>
         {children}
         <ScrollFX />
+        <SmoothScroll />
       </body>
     </html>
   );
