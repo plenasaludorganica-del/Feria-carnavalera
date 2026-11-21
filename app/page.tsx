@@ -9,6 +9,7 @@ import SearchBar from "@/components/SearchBar";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import Diag from "@/components/Diag";
+import FeedbackButton from "@/components/FeedbackButton";
 import IntroCurtain from "@/components/IntroCurtain";
 import ShareCard from "@/components/ShareCard";
 import SparkleRain from "@/components/SparkleRain";
@@ -27,6 +28,7 @@ export default async function Home() {
     <>
       <IntroCurtain />
       <Diag />
+      <FeedbackButton />
       <SiteHeader overHero />
       <Parallax />
 

@@ -976,3 +976,38 @@ body { background: #ffb02e; }
    sin esto se escapaban del scroll y el celular alejaba toda la página. */
 .table-wrap { position: relative; max-width: 100%; }
 html, body { overflow-x: clip; }
+
+/* ---------- Opiniones: pestaña al costado + ventanita ---------- */
+.fb-tab {
+  position: fixed; z-index: 60; right: 0; top: 50%;
+  translate: 0 -50%; rotate: -90deg; transform-origin: 100% 100%;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border: 0; border-radius: 12px 12px 0 0; cursor: pointer;
+  background: linear-gradient(180deg, #ff3d8a, #e0115f); color: #fff; font-weight: 800; font-size: .95rem;
+  box-shadow: 0 0 18px #e0115faa, 0 0 40px #e0115f55;
+}
+.fb-tab:hover { box-shadow: 0 0 26px #e0115fdd, 0 0 60px #e0115f77; }
+@media (max-width: 760px) {
+  .fb-tab { top: auto; bottom: 18px; right: 14px; translate: none; rotate: none; border-radius: 999px; padding: 12px; }
+  .fb-tab span { display: none; }
+}
+.fb-dialog {
+  width: min(92vw, 460px); padding: 0; border: 0; border-radius: 22px;
+  background: #fff; color: var(--tinta);
+  box-shadow: 0 0 0 2px #e0115f, 0 0 40px #e0115f88, 0 30px 80px -20px #000;
+}
+.fb-dialog::backdrop { background: #1a0811b3; backdrop-filter: blur(4px); }
+.fb-body { position: relative; padding: 24px; display: grid; gap: 12px; }
+.fb-body h2 { margin: 0; font-size: 1.35rem; padding-right: 32px; }
+.fb-sub { margin: -6px 0 0; color: var(--tinta-suave); font-size: .9rem; }
+.fb-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #f3eefa; font-size: 1.4rem; cursor: pointer; }
+.fb-stars { border: 0; padding: 0; margin: 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.fb-stars legend { font-weight: 700; margin-bottom: 6px; padding: 0; }
+.fb-stars button { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; font-size: 2.1rem; line-height: 1; color: #e4dbe9; transition: transform .12s, color .12s; }
+.fb-stars button.on { color: #ffb21f; text-shadow: 0 0 12px #ff9a1f99; }
+.fb-stars button:hover { transform: scale(1.15); }
+.fb-label { margin-left: 6px; font-weight: 700; color: #e0115f; }
+.fb-item[data-read="true"] { opacity: .7; }
+.fb-item-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.fb-item-stars { color: #ffb21f; font-size: 1.2rem; letter-spacing: 2px; }
+.fb-item small { color: var(--tinta-suave); }

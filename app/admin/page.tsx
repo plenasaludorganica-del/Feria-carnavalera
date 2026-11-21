@@ -39,7 +39,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         <div className="wrap" style={{ paddingBottom: 64 }}>
           <div className="section-head" style={{ marginBottom: 20 }}>
             <h1 className="page-title" style={{ margin: 0 }}>Vendedores</h1>
-            <Link href="/admin/pagos" className="btn btn-oro">Pagos y precio</Link>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Link href="/admin/opiniones" className="btn btn-fucsia">Opiniones</Link>
+              <Link href="/admin/pagos" className="btn btn-oro">Pagos y precio</Link>
+            </div>
           </div>
           <div className="stats">
             <div><b>{count("activo")}</b>Al día</div>
